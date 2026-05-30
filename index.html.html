@@ -1,0 +1,2874 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EZ Audita Performance360</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #F5F6FA;
+            --bg-card: #FFFFFF;
+            --bg-sidebar: #1A1D29;
+            --bg-sidebar-hover: #252836;
+            --bg-sidebar-active: #2D3142;
+            --bg-header: #FFFFFF;
+            --bg-input: #F5F6FA;
+            --bg-login: linear-gradient(135deg, #1A1D29 0%, #2D3142 50%, #1A1D29 100%);
+
+            --text-primary: #1A1D29;
+            --text-secondary: #4A4F63;
+            --text-muted: #8A8FA3;
+            --text-sidebar: #B0B4C8;
+            --text-sidebar-active: #FFFFFF;
+
+            --border: #E5E7EB;
+            --border-light: #F0F1F5;
+
+            --ez-orange: #F97316;
+            --ez-orange-light: rgba(249,115,22,0.08);
+            --danger: #EF4444;
+            --danger-bg: rgba(239,68,68,0.08);
+            --warning: #F59E0B;
+            --warning-bg: rgba(245,158,11,0.08);
+            --success: #10B981;
+            --success-bg: rgba(16,185,129,0.08);
+            --info: #3B82F6;
+            --info-bg: rgba(59,130,246,0.08);
+            --purple: #8B5CF6;
+            --purple-bg: rgba(139,92,246,0.08);
+
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.10);
+            --shadow-card: 0 1px 4px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-lg: 16px;
+
+            --sidebar-width: 272px;
+            --sidebar-collapsed: 72px;
+            --header-height: 64px;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* ======== SCROLLBAR ======== */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #C8CBD4; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9CA0AE; }
+
+        /* ======== LOGIN SCREEN ======== */
+        .login-overlay {
+            position: fixed; inset: 0; z-index: 10000;
+            background: var(--bg-login);
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        .login-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+        .login-box {
+            background: #FFFFFF;
+            border-radius: var(--radius-lg);
+            padding: 48px 40px;
+            width: 420px;
+            max-width: 92vw;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .login-logo {
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .login-logo span { color: var(--ez-orange); }
+        .login-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+        .login-field {
+            text-align: left;
+            margin-bottom: 16px;
+        }
+        .login-field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .login-field input, .login-field select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: inherit;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            transition: border 0.2s;
+            outline: none;
+        }
+        .login-field input:focus, .login-field select:focus {
+            border-color: var(--ez-orange);
+        }
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--ez-orange);
+            color: #FFF;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s, transform 0.1s;
+            font-family: inherit;
+        }
+        .login-btn:hover { background: #E8650F; }
+        .login-btn:active { transform: scale(0.98); }
+        .login-error {
+            background: var(--danger-bg);
+            color: var(--danger);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 10px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            display: none;
+        }
+        .login-error.show { display: block; }
+
+        /* ======== SIDEBAR ======== */
+        .sidebar {
+            position: fixed; left: 0; top: 0; bottom: 0;
+            width: var(--sidebar-width);
+            background: var(--bg-sidebar);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease, transform 0.3s ease;
+            overflow: hidden;
+        }
+        .sidebar.collapsed { width: var(--sidebar-collapsed); }
+
+        .sidebar-brand {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            min-height: 65px;
+        }
+        .brand-icon {
+            width: 36px; height: 36px; min-width: 36px;
+            border-radius: 10px;
+            background: var(--ez-orange);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 900; color: #FFF;
+        }
+        .brand-text {
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .brand-text h1 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #FFF;
+            line-height: 1.2;
+        }
+        .brand-text h1 span { color: var(--ez-orange); }
+        .brand-text small {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        .sidebar.collapsed .brand-text { display: none; }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 0;
+        }
+        .nav-section-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 16px 20px 8px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .sidebar.collapsed .nav-section-title { text-align: center; padding: 16px 4px 8px; font-size: 8px; }
+
+        .nav-group-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            color: var(--text-sidebar);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            font-size: 13px;
+            font-weight: 500;
+            user-select: none;
+        }
+        .nav-group-toggle:hover { background: var(--bg-sidebar-hover); color: #FFF; }
+        .nav-group-toggle i.fa-chevron-down {
+            margin-left: auto;
+            font-size: 10px;
+            transition: transform 0.2s;
+        }
+        .nav-group.open > .nav-group-toggle i.fa-chevron-down { transform: rotate(180deg); }
+        .nav-group-children {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .nav-group.open > .nav-group-children { max-height: 600px; }
+
+        .nav-link-ez {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 9px 20px 9px 44px;
+            color: var(--text-sidebar);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            font-size: 13px;
+            text-decoration: none;
+        }
+        .nav-link-ez:hover { background: var(--bg-sidebar-hover); color: #FFF; }
+        .nav-link-ez.active {
+            background: var(--bg-sidebar-active);
+            color: var(--ez-orange);
+            font-weight: 600;
+            border-right: 3px solid var(--ez-orange);
+        }
+        .nav-link-ez .nav-icon {
+            width: 20px; min-width: 20px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .nav-link-ez.top-level { padding-left: 20px; }
+        .sidebar.collapsed .nav-link-ez { padding: 10px 0; justify-content: center; }
+        .sidebar.collapsed .nav-link-ez span,
+        .sidebar.collapsed .nav-group-toggle span,
+        .sidebar.collapsed .nav-group-toggle i.fa-chevron-down { display: none; }
+        .sidebar.collapsed .nav-link-ez .nav-icon { font-size: 16px; }
+        .sidebar.collapsed .nav-group-toggle { justify-content: center; padding: 10px 0; }
+        .sidebar.collapsed .nav-group-children { max-height: 0 !important; }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .sidebar-footer:hover { background: var(--bg-sidebar-hover); }
+        .sidebar.collapsed .sidebar-footer span { display: none; }
+        .sidebar.collapsed .sidebar-footer { justify-content: center; }
+        .footer-avatar {
+            width: 32px; height: 32px; min-width: 32px;
+            border-radius: 8px;
+            background: var(--ez-orange);
+            color: #FFF;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700;
+        }
+        .footer-info { white-space: nowrap; overflow: hidden; }
+        .footer-info .name { font-size: 13px; font-weight: 600; color: #FFF; }
+        .footer-info .role { font-size: 11px; color: var(--text-muted); }
+
+        .sidebar-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0; visibility: hidden;
+            transition: all 0.3s;
+        }
+        .sidebar-overlay.show { opacity: 1; visibility: visible; }
+
+        /* ======== HEADER ======== */
+        .main-header {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: var(--header-height);
+            background: var(--bg-header);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 900;
+            transition: left 0.3s;
+            box-shadow: var(--shadow-sm);
+        }
+        .sidebar.collapsed ~ .main-header { left: var(--sidebar-collapsed); }
+
+        .header-left { display: flex; align-items: center; gap: 16px; }
+        .menu-toggle {
+            width: 36px; height: 36px;
+            border: none; background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .menu-toggle:hover { background: var(--ez-orange-light); color: var(--ez-orange); }
+
+        .header-title h2 {
+            font-size: 17px; font-weight: 700; color: var(--text-primary);
+        }
+        .header-breadcrumb {
+            font-size: 12px; color: var(--text-muted);
+        }
+
+        .header-right { display: flex; align-items: center; gap: 8px; }
+        .header-btn {
+            width: 36px; height: 36px;
+            border: none; background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; color: var(--text-secondary);
+            transition: all 0.2s;
+            position: relative;
+        }
+        .header-btn:hover { background: var(--ez-orange-light); color: var(--ez-orange); }
+        .notif-dot {
+            position: absolute; top: 6px; right: 6px;
+            width: 8px; height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: 2px solid var(--bg-header);
+        }
+
+        /* ======== MAIN CONTENT ======== */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            min-height: calc(100vh - var(--header-height));
+            transition: margin-left 0.3s;
+            background: var(--bg-body);
+        }
+        .sidebar.collapsed ~ .main-content { margin-left: var(--sidebar-collapsed); }
+
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+        .page-content { padding: 24px; max-width: 1440px; margin: 0 auto; }
+
+        /* ======== CARDS ======== */
+        .ez-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-light);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .card-header-ez {
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .card-header-ez h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-header-ez h3 i { color: var(--ez-orange); font-size: 14px; }
+        .card-body-ez { padding: 24px; }
+
+        /* ======== KPI GRID ======== */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .kpi-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-light);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .kpi-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .kpi-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .kpi-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .kpi-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+        .kpi-value { font-size: 26px; font-weight: 800; margin-bottom: 4px; line-height: 1.1; }
+        .kpi-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        .kpi-bar { height: 4px; background: var(--border-light); border-radius: 4px; margin-top: 12px; overflow: hidden; }
+        .kpi-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+
+        /* ======== MODULE PAGE HEADER ======== */
+        .module-page-header {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-light);
+        }
+        .mph-content { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .mph-icon {
+            width: 56px; height: 56px; min-width: 56px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .mph-info { flex: 1; min-width: 200px; }
+        .mph-info h2 { font-size: 22px; font-weight: 800; color: var(--text-primary); }
+        .mph-info h2 span { color: var(--ez-orange); }
+        .mph-info p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+        .mph-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+        .mph-stat { text-align: center; }
+        .mph-stat .val { font-size: 22px; font-weight: 800; }
+        .mph-stat .lbl { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+        /* ======== LAYOUT HELPERS ======== */
+        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+
+        /* ======== LOSS ITEMS ======== */
+        .loss-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .loss-item:last-child { border-bottom: none; }
+        .loss-icon {
+            width: 40px; height: 40px; min-width: 40px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+        }
+        .loss-info { flex: 1; }
+        .loss-info h4 { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .loss-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .loss-value { text-align: right; }
+        .loss-value .amount { font-size: 15px; font-weight: 700; }
+        .loss-value .pct { font-size: 11px; color: var(--text-muted); }
+
+        /* ======== TABLE ======== */
+        .ranking-table { width: 100%; border-collapse: collapse; }
+        .ranking-table thead th {
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--border-light);
+            background: var(--bg-input);
+        }
+        .ranking-table tbody td {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-light);
+        }
+        .ranking-table tbody tr:hover { background: var(--bg-input); }
+        .rank-num {
+            width: 28px; height: 28px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 8px;
+            background: var(--ez-orange-light);
+            color: var(--ez-orange);
+            font-size: 12px; font-weight: 800;
+        }
+
+        /* ======== PRIORITY TAGS ======== */
+        .priority-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .priority-tag.critical { background: var(--danger-bg); color: var(--danger); }
+        .priority-tag.high { background: var(--warning-bg); color: var(--warning); }
+        .priority-tag.medium { background: var(--info-bg); color: var(--info); }
+        .priority-tag.low { background: var(--success-bg); color: var(--success); }
+
+        /* ======== MINI PROGRESS ======== */
+        .mini-progress { display: flex; align-items: center; gap: 8px; }
+        .mp-bar { flex: 1; height: 6px; background: var(--border-light); border-radius: 6px; overflow: hidden; }
+        .mp-fill { height: 100%; border-radius: 6px; transition: width 1s ease; }
+        .mp-val { font-size: 12px; font-weight: 700; min-width: 36px; text-align: right; }
+
+        /* ======== FORMS ======== */
+        .form-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-light);
+            margin-bottom: 24px;
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+        .form-row-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+        .form-field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .form-field input,
+        .form-field select,
+        .form-field textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-family: inherit;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            transition: border 0.2s;
+            outline: none;
+        }
+        .form-field input:focus,
+        .form-field select:focus,
+        .form-field textarea:focus { border-color: var(--ez-orange); }
+
+        .form-field input[readonly] {
+            background: var(--ez-orange-light);
+            border-color: var(--ez-orange);
+            color: var(--ez-orange);
+            font-weight: 700;
+        }
+        .form-field .field-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .form-field .field-result {
+            font-size: 11px;
+            color: var(--success);
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .btn-ez {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-ez.primary { background: var(--ez-orange); color: #FFF; }
+        .btn-ez.primary:hover { background: #E8650F; }
+        .btn-ez.secondary { background: var(--bg-input); color: var(--text-secondary); border: 1px solid var(--border); }
+        .btn-ez.secondary:hover { background: var(--border-light); }
+        .btn-ez.success { background: var(--success); color: #FFF; }
+        .btn-ez.success:hover { background: #0EA472; }
+        .btn-ez.danger { background: var(--danger); color: #FFF; }
+        .btn-ez.danger:hover { background: #D93B3B; }
+
+        /* ======== SCORE RING ======== */
+        .score-ring-container { text-align: center; padding: 20px; }
+        .score-ring { position: relative; display: inline-block; }
+        .score-ring svg { transform: rotate(-90deg); }
+        .score-ring-bg { fill: none; stroke: var(--border-light); stroke-width: 8; }
+        .score-ring-fill { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1.5s ease; }
+        .score-ring-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .score-ring-value { font-size: 42px; font-weight: 900; }
+        .score-ring-label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+
+        /* ======== MODULO GRID ======== */
+        .modulo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .modulo-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-light);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .modulo-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+        .mod-header { display: flex; align-items: center; gap: 14px; }
+        .mod-icon {
+            width: 44px; height: 44px; min-width: 44px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+        .mod-title h3 { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+        .mod-title span { font-size: 11px; color: var(--text-muted); }
+        .mod-status { margin-top: 16px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+        /* ======== TABS ======== */
+        .tab-nav {
+            display: flex;
+            gap: 4px;
+            padding: 4px;
+            background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .tab-btn:hover { color: var(--text-primary); }
+        .tab-btn.active { background: var(--bg-card); color: var(--ez-orange); box-shadow: var(--shadow-sm); }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ======== TREE ======== */
+        .tree-container { padding: 0; }
+        .tree-node { margin-left: 0; }
+        .tree-node .tree-node { margin-left: 24px; }
+        .tree-node-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 4px;
+        }
+        .tree-node-header:hover { background: var(--bg-input); }
+        .tree-icon {
+            width: 32px; height: 32px; min-width: 32px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px;
+        }
+        .tree-label { font-size: 13px; font-weight: 600; color: var(--text-primary); flex: 1; }
+        .tree-children { display: none; }
+        .tree-node.open > .tree-children { display: block; }
+
+        /* ======== COLOR UTILITIES ======== */
+        .c-danger { color: var(--danger); }
+        .c-warning { color: var(--warning); }
+        .c-success { color: var(--success); }
+        .c-info { color: var(--info); }
+        .c-purple { color: var(--purple); }
+        .c-orange { color: var(--ez-orange); }
+
+        .bg-danger-light { background: var(--danger-bg); }
+        .bg-warning-light { background: var(--warning-bg); }
+        .bg-success-light { background: var(--success-bg); }
+        .bg-info-light { background: var(--info-bg); }
+        .bg-purple-light { background: var(--purple-bg); }
+        .bg-orange-light { background: var(--ez-orange-light); }
+
+        /* ======== RESULTADO CARD ======== */
+        .resultado-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-light);
+            margin-bottom: 24px;
+        }
+        .resultado-card.hidden { display: none; }
+        .resultado-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .resultado-header .r-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+        }
+        .resultado-header h3 { font-size: 17px; font-weight: 700; }
+        .resultado-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+        .resultado-item {
+            background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            text-align: center;
+        }
+        .resultado-item .r-val { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+        .resultado-item .r-lbl { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+        /* ======== ALERT BOX ======== */
+        .alert-box {
+            padding: 16px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-box.success { background: var(--success-bg); color: var(--success); border-left: 4px solid var(--success); }
+        .alert-box.warning { background: var(--warning-bg); color: var(--warning); border-left: 4px solid var(--warning); }
+        .alert-box.danger { background: var(--danger-bg); color: var(--danger); border-left: 4px solid var(--danger); }
+        .alert-box.info { background: var(--info-bg); color: var(--info); border-left: 4px solid var(--info); }
+
+        /* ======== RESPONSIVE ======== */
+        @media (max-width: 1024px) {
+            .row-2, .row-3 { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .form-row-3, .form-row-4 { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: var(--sidebar-width); }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .main-header { left: 0; }
+            .main-content { margin-left: 0; }
+            .sidebar.collapsed ~ .main-header { left: 0; }
+            .sidebar.collapsed ~ .main-content { margin-left: 0; }
+            .kpi-grid { grid-template-columns: 1fr 1fr; }
+            .modulo-grid { grid-template-columns: 1fr; }
+            .form-row-3, .form-row-4 { grid-template-columns: 1fr; }
+            .mph-stats { gap: 16px; }
+            .page-content { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- LOGIN SCREEN                                  -->
+<!-- ============================================ -->
+<div class="login-overlay" id="loginScreen">
+    <div class="login-box">
+        <div class="login-logo">EZ<span>.</span>Audita</div>
+        <div class="login-sub">Performance360 — Plataforma de Auditoria Inteligente</div>
+        <div class="login-error" id="loginError">Preencha todos os campos</div>
+        <form onsubmit="return handleLogin(event)">
+            <div class="login-field">
+                <label>Usuário</label>
+                <input type="text" id="loginUser" placeholder="Seu nome ou e-mail">
+            </div>
+            <div class="login-field">
+                <label>Senha</label>
+                <input type="password" id="loginPass" placeholder="Sua senha">
+            </div>
+            <div class="login-field">
+                <label>Perfil</label>
+                <select id="loginPerfil">
+                    <option>Auditor Sênior</option>
+                    <option>Consultor</option>
+                    <option>Gestor</option>
+                    <option>Diretor</option>
+                    <option>Administrador</option>
+                </select>
+            </div>
+            <button type="submit" class="login-btn"><i class="fas fa-sign-in-alt"></i> Entrar no Sistema</button>
+        </form>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SIDEBAR                                       -->
+<!-- ============================================ -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon">EZ</div>
+        <div class="brand-text">
+            <h1>EZ<span>.</span>Audita</h1>
+            <small>Performance360</small>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section-title">Principal</div>
+        <a class="nav-link-ez top-level active" onclick="navigateTo('dashboard', this)">
+            <span class="nav-icon"><i class="fas fa-th-large"></i></span>
+            <span>Dashboard</span>
+        </a>
+
+        <div class="nav-section-title">Entrada de Dados</div>
+        <div class="nav-group open" id="navFormularios">
+            <div class="nav-group-toggle" onclick="toggleNavGroup('navFormularios')">
+                <i class="fas fa-edit"></i>
+                <span>Formulários</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="nav-group-children">
+                <a class="nav-link-ez" onclick="navigateTo('form-empresa', this)">
+                    <span class="nav-icon"><i class="fas fa-building"></i></span>
+                    <span>Dados da Empresa</span>
+                </a>
+                <a class="nav-link-ez" onclick="navigateTo('form-saude', this)">
+                    <span class="nav-icon"><i class="fas fa-heartbeat"></i></span>
+                    <span>Saúde & Benefícios</span>
+                </a>
+                <a class="nav-link-ez" onclick="navigateTo('form-tributario', this)">
+                    <span class="nav-icon"><i class="fas fa-landmark"></i></span>
+                    <span>Tributário & Fiscal</span>
+                </a>
+                <a class="nav-link-ez" onclick="navigateTo('form-energia', this)">
+                    <span class="nav-icon"><i class="fas fa-bolt"></i></span>
+                    <span>Energia Elétrica</span>
+                </a>
+                <a class="nav-link-ez" onclick="navigateTo('form-rh', this)">
+                    <span class="nav-icon"><i class="fas fa-users"></i></span>
+                    <span>RH & Pessoas</span>
+                </a>
+                <a class="nav-link-ez" onclick="navigateTo('form-producao', this)">
+                    <span class="nav-icon"><i class="fas fa-industry"></i></span>
+                    <span>Produção & OEE</span>
+                </a>
+                <a class="nav-link-ez" onclick="navigateTo('form-compras', this)">
+                    <span class="nav-icon"><i class="fas fa-shopping-cart"></i></span>
+                    <span>Compras</span>
+                </a>
+                <a class="nav-link-ez" onclick="navigateTo('form-financeiro', this)">
+                    <span class="nav-icon"><i class="fas fa-dollar-sign"></i></span>
+                    <span>Financeiro</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section-title">Análises</div>
+        <div class="nav-group" id="navAnalises">
+            <div class="nav-group-toggle" onclick="toggleNavGroup('navAnalises')">
+                <i class="fas fa-chart-bar"></i>
+                <span>Relatórios</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="nav-group-children">
+                <a class="nav-link-ez" onclick="navigateTo('resultado-geral', this)">
+                    <span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                    <span>Resultado Geral</span>
+                </a>
+                <a class="nav-link-ez" onclick="navigateTo('matriz-perdas', this)">
+                    <span class="nav-icon"><i class="fas fa-exclamation-triangle"></i></span>
+                    <span>Matriz de Perdas</span>
+                </a>
+                <a class="nav-link-ez" onclick="navigateTo('score', this)">
+                    <span class="nav-icon"><i class="fas fa-award"></i></span>
+                    <span>Score EZ</span>
+                </a>
+                <a class="nav-link-ez" onclick="navigateTo('priorizacao', this)">
+                    <span class="nav-icon"><i class="fas fa-sort-amount-down"></i></span>
+                    <span>Priorização</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-section-title">Sistema</div>
+        <a class="nav-link-ez top-level" onclick="navigateTo('config', this)">
+            <span class="nav-icon"><i class="fas fa-cog"></i></span>
+            <span>Configurações</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-footer" onclick="handleLogout()">
+        <div class="footer-avatar" id="userAvatar">U</div>
+        <div class="footer-info">
+            <div class="name" id="userName">Usuário</div>
+            <div class="role" id="userPerfil">Perfil</div>
+        </div>
+    </div>
+</aside>
+
+<!-- ============================================ -->
+<!-- HEADER                                        -->
+<!-- ============================================ -->
+<header class="main-header">
+    <div class="header-left">
+        <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div class="header-title">
+            <h2 id="pageTitle">Dashboard</h2>
+            <div class="header-breadcrumb" id="pageBreadcrumb">EZ Audita / Dashboard</div>
+        </div>
+    </div>
+    <div class="header-right">
+        <button class="header-btn" onclick="calcularTudo()" title="Recalcular tudo"><i class="fas fa-calculator"></i></button>
+        <button class="header-btn" onclick="exportarDados()" title="Exportar dados"><i class="fas fa-download"></i></button>
+        <button class="header-btn" title="Notificações"><i class="fas fa-bell"></i><span class="notif-dot"></span></button>
+    </div>
+</header>
+
+<!-- ============================================ -->
+<!-- MAIN CONTENT                                  -->
+<!-- ============================================ -->
+<div class="main-content">
+    <!-- ========================================== -->
+    <!-- PAGE: DASHBOARD                             -->
+    <!-- ========================================== -->
+    <div class="page-section active" id="page-dashboard">
+        <div class="page-content">
+            <div class="module-page-header" style="border-left:4px solid var(--ez-orange);">
+                <div class="mph-content">
+                    <div class="mph-icon bg-orange-light c-orange" style="font-size:32px;"><i class="fas fa-th-large"></i></div>
+                    <div class="mph-info">
+                        <h2>Dashboard <span>Master</span></h2>
+                        <p>Visão consolidada — preencha os formulários para ver os resultados</p>
+                    </div>
+                    <div class="mph-stats">
+                        <div class="mph-stat"><div class="val c-danger" id="dash-perdas-total">R$ 0</div><div class="lbl">Perdas Totais</div></div>
+                        <div class="mph-stat"><div class="val c-success" id="dash-saving-total">R$ 0</div><div class="lbl">Saving Potencial</div></div>
+                        <div class="mph-stat"><div class="val c-orange" id="dash-score-total">--</div><div class="lbl">Score EZ</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STATUS DOS MÓDULOS -->
+            <div class="ez-card" style="margin-bottom:24px;">
+                <div class="card-header-ez"><h3><i class="fas fa-clipboard-check"></i> Status dos Módulos</h3></div>
+                <div class="card-body-ez">
+                    <div id="dash-status-modulos">
+                        <div class="alert-box info" style="margin-bottom:16px;">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>Comece preenchendo os formulários!</strong><br>
+                                Acesse o menu <strong>"Formulários"</strong> à esquerda e preencha os dados da empresa. Os resultados serão calculados automaticamente.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modulo-grid" style="margin-bottom:0;">
+                        <div class="modulo-card" onclick="navigateTo('form-empresa')">
+                            <div class="mod-header">
+                                <div class="mod-icon bg-info-light c-info"><i class="fas fa-building"></i></div>
+                                <div class="mod-title"><h3>Dados da Empresa</h3><span>Cadastro base</span></div>
+                            </div>
+                            <div class="mod-status" id="status-empresa"><span class="status-dot" style="background:var(--warning)"></span> <span class="c-warning">Pendente</span></div>
+                        </div>
+                        <div class="modulo-card" onclick="navigateTo('form-saude')">
+                            <div class="mod-header">
+                                <div class="mod-icon bg-danger-light c-danger"><i class="fas fa-heartbeat"></i></div>
+                                <div class="mod-title"><h3>Saúde & Benefícios</h3><span>Plano, sinistros, afastamentos</span></div>
+                            </div>
+                            <div class="mod-status" id="status-saude"><span class="status-dot" style="background:var(--warning)"></span> <span class="c-warning">Pendente</span></div>
+                        </div>
+                        <div class="modulo-card" onclick="navigateTo('form-tributario')">
+                            <div class="mod-header">
+                                <div class="mod-icon bg-purple-light c-purple"><i class="fas fa-landmark"></i></div>
+                                <div class="mod-title"><h3>Tributário & Fiscal</h3><span>Impostos, créditos, regime</span></div>
+                            </div>
+                            <div class="mod-status" id="status-tributario"><span class="status-dot" style="background:var(--warning)"></span> <span class="c-warning">Pendente</span></div>
+                        </div>
+                        <div class="modulo-card" onclick="navigateTo('form-energia')">
+                            <div class="mod-header">
+                                <div class="mod-icon bg-warning-light c-warning"><i class="fas fa-bolt"></i></div>
+                                <div class="mod-title"><h3>Energia Elétrica</h3><span>Faturas, demanda, reativos</span></div>
+                            </div>
+                            <div class="mod-status" id="status-energia"><span class="status-dot" style="background:var(--warning)"></span> <span class="c-warning">Pendente</span></div>
+                        </div>
+                        <div class="modulo-card" onclick="navigateTo('form-rh')">
+                            <div class="mod-header">
+                                <div class="mod-icon bg-success-light c-success"><i class="fas fa-users"></i></div>
+                                <div class="mod-title"><h3>RH & Pessoas</h3><span>Turnover, absenteísmo, folha</span></div>
+                            </div>
+                            <div class="mod-status" id="status-rh"><span class="status-dot" style="background:var(--warning)"></span> <span class="c-warning">Pendente</span></div>
+                        </div>
+                        <div class="modulo-card" onclick="navigateTo('form-producao')">
+                            <div class="mod-header">
+                                <div class="mod-icon bg-orange-light c-orange"><i class="fas fa-industry"></i></div>
+                                <div class="mod-title"><h3>Produção & OEE</h3><span>Refugo, paradas, performance</span></div>
+                            </div>
+                            <div class="mod-status" id="status-producao"><span class="status-dot" style="background:var(--warning)"></span> <span class="c-warning">Pendente</span></div>
+                        </div>
+                        <div class="modulo-card" onclick="navigateTo('form-compras')">
+                            <div class="mod-header">
+                                <div class="mod-icon bg-success-light c-success"><i class="fas fa-shopping-cart"></i></div>
+                                <div class="mod-title"><h3>Compras</h3><span>Fornecedores, sobrepreço</span></div>
+                            </div>
+                            <div class="mod-status" id="status-compras"><span class="status-dot" style="background:var(--warning)"></span> <span class="c-warning">Pendente</span></div>
+                        </div>
+                        <div class="modulo-card" onclick="navigateTo('form-financeiro')">
+                            <div class="mod-header">
+                                <div class="mod-icon bg-warning-light c-warning"><i class="fas fa-dollar-sign"></i></div>
+                                <div class="mod-title"><h3>Financeiro</h3><span>Caixa, inadimplência, juros</span></div>
+                            </div>
+                            <div class="mod-status" id="status-financeiro"><span class="status-dot" style="background:var(--warning)"></span> <span class="c-warning">Pendente</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESUMO DE PERDAS (aparece quando há dados) -->
+            <div class="ez-card hidden" id="dash-resumo-perdas">
+                <div class="card-header-ez"><h3><i class="fas fa-exclamation-triangle"></i> Resumo de Perdas Identificadas</h3></div>
+                <div class="card-body-ez" id="dash-perdas-lista">
+                    <!-- Preenchido via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FORM: DADOS DA EMPRESA                      -->
+    <!-- ========================================== -->
+    <div class="page-section" id="page-form-empresa">
+        <div class="page-content">
+            <div class="module-page-header" style="border-left:4px solid var(--info);">
+                <div class="mph-content">
+                    <div class="mph-icon bg-info-light c-info" style="font-size:32px;"><i class="fas fa-building"></i></div>
+                    <div class="mph-info">
+                        <h2>Dados da <span>Empresa</span></h2>
+                        <p>Preencha as informações básicas da empresa auditada</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-id-card" style="color:var(--ez-orange);"></i> Identificação</h3>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>CNPJ</label>
+                        <input type="text" id="emp-cnpj" placeholder="00.000.000/0000-00">
+                    </div>
+                    <div class="form-field">
+                        <label>Razão Social</label>
+                        <input type="text" id="emp-razao" placeholder="Nome da empresa">
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Segmento</label>
+                        <select id="emp-segmento">
+                            <option value="">Selecione...</option>
+                            <option>Indústria</option>
+                            <option>Comércio</option>
+                            <option>Serviços</option>
+                            <option>Agro</option>
+                            <option>Construção</option>
+                            <option>Tecnologia</option>
+                            <option>Saúde</option>
+                            <option>Educação</option>
+                            <option>Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>Regime Tributário</label>
+                        <select id="emp-regime">
+                            <option value="">Selecione...</option>
+                            <option>Lucro Real</option>
+                            <option>Lucro Presumido</option>
+                            <option>Simples Nacional</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>UF</label>
+                        <select id="emp-uf">
+                            <option value="">UF</option>
+                            <option>SP</option><option>RJ</option><option>MG</option><option>RS</option>
+                            <option>PR</option><option>SC</option><option>BA</option><option>PE</option>
+                            <option>CE</option><option>GO</option><option>PA</option><option>AM</option>
+                            <option>ES</option><option>MT</option><option>MS</option><option>DF</option>
+                            <option>MA</option><option>PB</option><option>RN</option><option>AL</option>
+                            <option>SE</option><option>PI</option><option>TO</option><option>RO</option>
+                            <option>AC</option><option>AP</option><option>RR</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-chart-line" style="color:var(--success);"></i> Dados Financeiros</h3>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Faturamento Anual (R$)</label>
+                        <input type="number" id="emp-faturamento" placeholder="Ex: 48000000" step="1000">
+                        <div class="field-hint">Receita bruta dos últimos 12 meses</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Lucro Líquido Anual (R$)</label>
+                        <input type="number" id="emp-lucro" placeholder="Ex: 3840000" step="1000">
+                    </div>
+                    <div class="form-field">
+                        <label>Margem Líquida (%)</label>
+                        <input type="text" id="emp-margem" readonly value="--">
+                        <div class="field-hint">Calculado automaticamente</div>
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Total de Colaboradores</label>
+                        <input type="number" id="emp-colaboradores" placeholder="Ex: 248">
+                    </div>
+                    <div class="form-field">
+                        <label>Folha Mensal (R$)</label>
+                        <input type="number" id="emp-folha" placeholder="Ex: 350000" step="1000">
+                    </div>
+                    <div class="form-field">
+                        <label>Folha Anual (R$)</label>
+                        <input type="text" id="emp-folha-anual" readonly value="--">
+                        <div class="field-hint">Calculado automaticamente</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-user-tie" style="color:var(--purple);"></i> Contato</h3>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Responsável</label>
+                        <input type="text" id="emp-responsavel" placeholder="Nome do contato principal">
+                    </div>
+                    <div class="form-field">
+                        <label>Cargo</label>
+                        <input type="text" id="emp-cargo" placeholder="Diretor, Gerente, etc.">
+                    </div>
+                    <div class="form-field">
+                        <label>E-mail</label>
+                        <input type="email" id="emp-email" placeholder="contato@empresa.com">
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:12px;">
+                <button class="btn-ez primary" onclick="salvarEmpresa()"><i class="fas fa-save"></i> Salvar Dados da Empresa</button>
+                <button class="btn-ez secondary" onclick="limparEmpresa()"><i class="fas fa-eraser"></i> Limpar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FORM: SAÚDE & BENEFÍCIOS (FUNCIONAL)        -->
+    <!-- ========================================== -->
+    <div class="page-section" id="page-form-saude">
+        <div class="page-content">
+            <div class="module-page-header" style="border-left:4px solid var(--danger);">
+                <div class="mph-content">
+                    <div class="mph-icon bg-danger-light c-danger" style="font-size:32px;"><i class="fas fa-heartbeat"></i></div>
+                    <div class="mph-info">
+                        <h2>Saúde & <span>Benefícios</span></h2>
+                        <p>Preencha os dados do plano de saúde, sinistralidade e afastamentos</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-notes-medical" style="color:var(--danger);"></i> Plano de Saúde</h3>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Operadora</label>
+                        <input type="text" id="saude-operadora" placeholder="Ex: Unimed, Bradesco Saúde...">
+                    </div>
+                    <div class="form-field">
+                        <label>Nº de Vidas (titular + dependentes)</label>
+                        <input type="number" id="saude-vidas" placeholder="Ex: 620">
+                    </div>
+                    <div class="form-field">
+                        <label>Tipo de Contrato</label>
+                        <select id="saude-tipo">
+                            <option value="">Selecione...</option>
+                            <option>Coparticipação</option>
+                            <option>Pré-pagamento</option>
+                            <option>Pós-pagamento</option>
+                            <option>Autogestão</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row form-row-4">
+                    <div class="form-field">
+                        <label>Valor Mensal Total (R$)</label>
+                        <input type="number" id="saude-mensal" placeholder="Ex: 180000" step="100" oninput="calcularSaude()">
+                        <div class="field-hint">Custo total pago à operadora/mês</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Custo Per Capita (R$/vida)</label>
+                        <input type="text" id="saude-percapita" readonly value="--">
+                        <div class="field-hint">Calculado automaticamente</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Custo Anual (R$)</label>
+                        <input type="text" id="saude-anual" readonly value="--">
+                        <div class="field-hint">Calculado automaticamente</div>
+                    </div>
+                    <div class="form-field">
+                        <label>% sobre Folha</label>
+                        <input type="text" id="saude-perc-folha" readonly value="--">
+                        <div class="field-hint">Calculado automaticamente</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-chart-area" style="color:var(--warning);"></i> Sinistralidade & Reajuste</h3>
+                <div class="form-row form-row-4">
+                    <div class="form-field">
+                        <label>Sinistralidade Atual (%)</label>
+                        <input type="number" id="saude-sinistralidade" placeholder="Ex: 82" step="0.1" oninput="calcularSaude()">
+                        <div class="field-hint">Informado pela operadora</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Sinistralidade Meta (%)</label>
+                        <input type="number" id="saude-sinistralidade-meta" value="75" step="0.1" oninput="calcularSaude()">
+                        <div class="field-hint">Ideal: abaixo de 75%</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Último Reajuste (%)</label>
+                        <input type="number" id="saude-reajuste" placeholder="Ex: 18.5" step="0.1" oninput="calcularSaude()">
+                    </div>
+                    <div class="form-field">
+                        <label>VCMH do Período (%)</label>
+                        <input type="number" id="saude-vcmh" placeholder="Ex: 12.3" step="0.1" oninput="calcularSaude()">
+                        <div class="field-hint">Variação Custo Médico-Hospitalar</div>
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Reajuste Excedente (%)</label>
+                        <input type="text" id="saude-reajuste-excedente" readonly value="--">
+                        <div class="field-hint">Reajuste acima do VCMH</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Perda por Reajuste Indevido (R$/ano)</label>
+                        <input type="text" id="saude-perda-reajuste" readonly value="--">
+                        <div class="field-result" id="saude-perda-reajuste-hint"></div>
+                    </div>
+                    <div class="form-field">
+                        <label>Perda por Sinistralidade Alta (R$/ano)</label>
+                        <input type="text" id="saude-perda-sinistralidade" readonly value="--">
+                        <div class="field-result" id="saude-perda-sinist-hint"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-procedures" style="color:var(--purple);"></i> Afastamentos & Absenteísmo</h3>
+                <div class="form-row form-row-4">
+                    <div class="form-field">
+                        <label>Total de Atestados (12 meses)</label>
+                        <input type="number" id="saude-atestados" placeholder="Ex: 1840" oninput="calcularSaude()">
+                    </div>
+                    <div class="form-field">
+                        <label>Dias Perdidos (12 meses)</label>
+                        <input type="number" id="saude-dias-perdidos" placeholder="Ex: 4200" oninput="calcularSaude()">
+                    </div>
+                    <div class="form-field">
+                        <label>Afastamentos INSS (>15 dias)</label>
+                        <input type="number" id="saude-afastamentos-inss" placeholder="Ex: 18" oninput="calcularSaude()">
+                    </div>
+                    <div class="form-field">
+                        <label>Custo Médio/Dia Colaborador (R$)</label>
+                        <input type="number" id="saude-custo-dia" placeholder="Ex: 180" step="10" oninput="calcularSaude()">
+                        <div class="field-hint">Folha mensal ÷ 30 ÷ Nº colaboradores</div>
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Custo do Absenteísmo (R$/ano)</label>
+                        <input type="text" id="saude-custo-absenteismo" readonly value="--">
+                    </div>
+                    <div class="form-field">
+                        <label>Taxa de Absenteísmo (%)</label>
+                        <input type="text" id="saude-taxa-absenteismo" readonly value="--">
+                        <div class="field-hint">Ideal: abaixo de 3%</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Média Atestados/Colaborador</label>
+                        <input type="text" id="saude-media-atestados" readonly value="--">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-file-medical-alt" style="color:var(--info);"></i> Top Causas de Atestados</h3>
+                <div class="alert-box info" style="margin-bottom:16px;">
+                    <i class="fas fa-info-circle"></i>
+                    Preencha as principais causas de atestados para a análise da árvore de causa.
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Causa 1 — CID/Descrição</label>
+                        <input type="text" id="saude-causa1" placeholder="Ex: M54 — Dorsalgia (coluna)">
+                    </div>
+                    <div class="form-field">
+                        <label>Nº de Atestados</label>
+                        <input type="number" id="saude-causa1-qtd" placeholder="Ex: 380">
+                    </div>
+                    <div class="form-field">
+                        <label>% do Total</label>
+                        <input type="text" id="saude-causa1-perc" readonly value="--">
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Causa 2 — CID/Descrição</label>
+                        <input type="text" id="saude-causa2" placeholder="Ex: F41 — Ansiedade">
+                    </div>
+                    <div class="form-field">
+                        <label>Nº de Atestados</label>
+                        <input type="number" id="saude-causa2-qtd" placeholder="Ex: 290">
+                    </div>
+                    <div class="form-field">
+                        <label>% do Total</label>
+                        <input type="text" id="saude-causa2-perc" readonly value="--">
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Causa 3 — CID/Descrição</label>
+                        <input type="text" id="saude-causa3" placeholder="Ex: J06 — Infecção vias aéreas">
+                    </div>
+                    <div class="form-field">
+                        <label>Nº de Atestados</label>
+                        <input type="number" id="saude-causa3-qtd" placeholder="Ex: 220">
+                    </div>
+                    <div class="form-field">
+                        <label>% do Total</label>
+                        <input type="text" id="saude-causa3-perc" readonly value="--">
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESULTADO AUTOMÁTICO -->
+            <div class="resultado-card hidden" id="resultado-saude">
+                <div class="resultado-header">
+                    <div class="r-icon bg-danger-light c-danger"><i class="fas fa-heartbeat"></i></div>
+                    <div>
+                        <h3>Resultado — Saúde & Benefícios</h3>
+                        <p style="font-size:12px;color:var(--text-muted);">Calculado automaticamente com base nos dados informados</p>
+                    </div>
+                </div>
+                <div class="resultado-grid" id="resultado-saude-grid">
+                    <!-- Preenchido via JS -->
+                </div>
+                <div style="margin-top:20px;" id="resultado-saude-alertas">
+                    <!-- Alertas via JS -->
+                </div>
+            </div>
+
+            <div style="display:flex;gap:12px;margin-top:8px;">
+                <button class="btn-ez primary" onclick="salvarSaude()"><i class="fas fa-save"></i> Salvar Saúde</button>
+                <button class="btn-ez success" onclick="calcularSaude(); document.getElementById('resultado-saude').classList.remove('hidden');">
+                    <i class="fas fa-calculator"></i> Calcular Resultados
+                </button>
+                <button class="btn-ez secondary" onclick="limparSaude()"><i class="fas fa-eraser"></i> Limpar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FORM: TRIBUTÁRIO (FUNCIONAL)                -->
+    <!-- ========================================== -->
+    <div class="page-section" id="page-form-tributario">
+        <div class="page-content">
+            <div class="module-page-header" style="border-left:4px solid var(--purple);">
+                <div class="mph-content">
+                    <div class="mph-icon bg-purple-light c-purple" style="font-size:32px;"><i class="fas fa-landmark"></i></div>
+                    <div class="mph-info">
+                        <h2>Tributário & <span>Fiscal</span></h2>
+                        <p>Preencha os dados fiscais para identificação de créditos e sobreposições</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-file-invoice-dollar" style="color:var(--purple);"></i> Impostos Pagos (últimos 12 meses)</h3>
+                <div class="form-row form-row-4">
+                    <div class="form-field">
+                        <label>ICMS Pago (R$)</label>
+                        <input type="number" id="trib-icms" placeholder="Ex: 1200000" step="1000" oninput="calcularTributario()">
+                    </div>
+                    <div class="form-field">
+                        <label>PIS Pago (R$)</label>
+                        <input type="number" id="trib-pis" placeholder="Ex: 320000" step="1000" oninput="calcularTributario()">
+                    </div>
+                    <div class="form-field">
+                        <label>COFINS Pago (R$)</label>
+                        <input type="number" id="trib-cofins" placeholder="Ex: 1480000" step="1000" oninput="calcularTributario()">
+                    </div>
+                    <div class="form-field">
+                        <label>IRPJ + CSLL Pago (R$)</label>
+                        <input type="number" id="trib-irpj" placeholder="Ex: 960000" step="1000" oninput="calcularTributario()">
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>INSS Patronal (R$)</label>
+                        <input type="number" id="trib-inss" placeholder="Ex: 840000" step="1000" oninput="calcularTributario()">
+                    </div>
+                    <div class="form-field">
+                        <label>RAT / FAP Atual (%)</label>
+                        <input type="number" id="trib-rat" placeholder="Ex: 3.0" step="0.1" oninput="calcularTributario()">
+                        <div class="field-hint">RAT × FAP efetivo</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Total Tributos (R$/ano)</label>
+                        <input type="text" id="trib-total" readonly value="--">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>Carga Tributária (%)</label>
+                        <input type="text" id="trib-carga" readonly value="--">
+                        <div class="field-hint">Total tributos ÷ Faturamento</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Benchmark Setor (%)</label>
+                        <input type="number" id="trib-benchmark" value="12.8" step="0.1">
+                        <div class="field-hint">Carga tributária média do setor</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-search-dollar" style="color:var(--success);"></i> Créditos & Oportunidades</h3>
+                <div class="alert-box info" style="margin-bottom:16px;">
+                    <i class="fas fa-robot"></i>
+                    Marque as situações que se aplicam à empresa. O sistema calculará os créditos potenciais.
+                </div>
+
+                <div style="margin-bottom:12px;">
+                    <label style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg-input);border-radius:var(--radius-sm);cursor:pointer;">
+                        <input type="checkbox" id="trib-check-icms-pis" onchange="calcularTributario()" style="width:18px;height:18px;accent-color:var(--ez-orange);">
+                        <div>
+                            <strong style="font-size:13px;">Exclusão do ICMS da base PIS/COFINS</strong>
+                            <div style="font-size:11px;color:var(--text-muted);">Tema 69 STF — Crédito sobre últimos 60 meses</div>
+                        </div>
+                    </label>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg-input);border-radius:var(--radius-sm);cursor:pointer;">
+                        <input type="checkbox" id="trib-check-creditos-insumo" onchange="calcularTributario()" style="width:18px;height:18px;accent-color:var(--ez-orange);">
+                        <div>
+                            <strong style="font-size:13px;">Créditos PIS/COFINS sobre insumos</strong>
+                            <div style="font-size:11px;color:var(--text-muted);">Energia, fretes, embalagens, aluguel, manutenção</div>
+                        </div>
+                    </label>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg-input);border-radius:var(--radius-sm);cursor:pointer;">
+                        <input type="checkbox" id="trib-check-rat" onchange="calcularTributario()" style="width:18px;height:18px;accent-color:var(--ez-orange);">
+                        <div>
+                            <strong style="font-size:13px;">Revisão RAT/FAP junto ao INSS</strong>
+                            <div style="font-size:11px;color:var(--text-muted);">FAP pode ser reduzido com gestão de SST</div>
+                        </div>
+                    </label>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg-input);border-radius:var(--radius-sm);cursor:pointer;">
+                        <input type="checkbox" id="trib-check-regime" onchange="calcularTributario()" style="width:18px;height:18px;accent-color:var(--ez-orange);">
+                        <div>
+                            <strong style="font-size:13px;">Revisão do regime tributário</strong>
+                            <div style="font-size:11px;color:var(--text-muted);">Simulação Lucro Real vs Presumido vs Simples</div>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="form-row form-row-3" style="margin-top:20px;">
+                    <div class="form-field">
+                        <label>Valor Insumos PIS/COFINS (R$/ano)</label>
+                        <input type="number" id="trib-insumos" placeholder="Ex: 2400000" step="10000" oninput="calcularTributario()">
+                        <div class="field-hint">Energia + fretes + embalagens + manutenção</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Folha de Pagamento (R$/ano)</label>
+                        <input type="number" id="trib-folha-anual" placeholder="Ex: 4200000" step="10000" oninput="calcularTributario()">
+                        <div class="field-hint">Base para cálculo RAT/FAP</div>
+                    </div>
+                    <div class="form-field">
+                        <label>RAT Meta (%)</label>
+                        <input type="number" id="trib-rat-meta" value="1.0" step="0.1" oninput="calcularTributario()">
+                        <div class="field-hint">FAP mínimo + RAT ajustado</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESULTADO TRIBUTÁRIO -->
+            <div class="resultado-card hidden" id="resultado-tributario">
+                <div class="resultado-header">
+                    <div class="r-icon bg-purple-light c-purple"><i class="fas fa-landmark"></i></div>
+                    <div>
+                        <h3>Resultado — Tributário & Fiscal</h3>
+                        <p style="font-size:12px;color:var(--text-muted);">Créditos e oportunidades identificadas</p>
+                    </div>
+                </div>
+                <div class="resultado-grid" id="resultado-tributario-grid">
+                    <!-- Preenchido via JS -->
+                </div>
+                <div style="margin-top:20px;" id="resultado-tributario-alertas"></div>
+            </div>
+
+            <div style="display:flex;gap:12px;margin-top:8px;">
+                <button class="btn-ez primary" onclick="salvarTributario()"><i class="fas fa-save"></i> Salvar Tributário</button>
+                <button class="btn-ez success" onclick="calcularTributario(); document.getElementById('resultado-tributario').classList.remove('hidden');">
+                    <i class="fas fa-calculator"></i> Calcular Créditos
+                </button>
+                <button class="btn-ez secondary" onclick="limparTributario()"><i class="fas fa-eraser"></i> Limpar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FORM: ENERGIA (FUNCIONAL)                   -->
+    <!-- ========================================== -->
+    <div class="page-section" id="page-form-energia">
+        <div class="page-content">
+            <div class="module-page-header" style="border-left:4px solid var(--warning);">
+                <div class="mph-content">
+                    <div class="mph-icon bg-warning-light c-warning" style="font-size:32px;"><i class="fas fa-bolt"></i></div>
+                    <div class="mph-info">
+                        <h2>Energia <span>Elétrica</span></h2>
+                        <p>Preencha dados das faturas para análise de demanda, reativos e tarifação</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-file-invoice" style="color:var(--warning);"></i> Dados da Fatura</h3>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Distribuidora</label>
+                        <input type="text" id="energia-distrib" placeholder="Ex: CPFL, Energisa, Enel...">
+                    </div>
+                    <div class="form-field">
+                        <label>Subgrupo Tarifário</label>
+                        <select id="energia-subgrupo">
+                            <option value="">Selecione...</option>
+                            <option>A4 (2,3kV a 25kV)</option>
+                            <option>A3 (69kV)</option>
+                            <option>A3a (30kV a 44kV)</option>
+                            <option>A2 (88kV a 138kV)</option>
+                            <option>B (Baixa Tensão)</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>Modalidade Tarifária</label>
+                        <select id="energia-modalidade">
+                            <option value="">Selecione...</option>
+                            <option>Verde</option>
+                            <option>Azul</option>
+                            <option>Convencional</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row form-row-4">
+                    <div class="form-field">
+                        <label>Demanda Contratada (kW)</label>
+                        <input type="number" id="energia-demanda-contratada" placeholder="Ex: 500" oninput="calcularEnergia()">
+                    </div>
+                    <div class="form-field">
+                        <label>Demanda Medida Máx. (kW)</label>
+                        <input type="number" id="energia-demanda-medida" placeholder="Ex: 380" oninput="calcularEnergia()">
+                        <div class="field-hint">Maior demanda registrada no período</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Consumo Médio Mensal (kWh)</label>
+                        <input type="number" id="energia-consumo" placeholder="Ex: 85000" oninput="calcularEnergia()">
+                    </div>
+                    <div class="form-field">
+                        <label>Valor Médio Mensal (R$)</label>
+                        <input type="number" id="energia-valor-mensal" placeholder="Ex: 42000" step="100" oninput="calcularEnergia()">
+                    </div>
+                </div>
+                <div class="form-row form-row-4">
+                    <div class="form-field">
+                        <label>Energia Reativa (kVArh)</label>
+                        <input type="number" id="energia-reativa" placeholder="Ex: 12000" oninput="calcularEnergia()">
+                    </div>
+                    <div class="form-field">
+                        <label>Multa Reativos (R$/mês)</label>
+                        <input type="number" id="energia-multa-reativa" placeholder="Ex: 3200" oninput="calcularEnergia()">
+                    </div>
+                    <div class="form-field">
+                        <label>Custo Anual Energia (R$)</label>
+                        <input type="text" id="energia-custo-anual" readonly value="--">
+                    </div>
+                    <div class="form-field">
+                        <label>Excedente Demanda (%)</label>
+                        <input type="text" id="energia-excedente-demanda" readonly value="--">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-solar-panel" style="color:var(--success);"></i> Mercado Livre & Oportunidades</h3>
+                <div style="margin-bottom:12px;">
+                    <label style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg-input);border-radius:var(--radius-sm);cursor:pointer;">
+                        <input type="checkbox" id="energia-check-ml" onchange="calcularEnergia()" style="width:18px;height:18px;accent-color:var(--ez-orange);">
+                        <div>
+                            <strong style="font-size:13px;">Elegível para Mercado Livre de Energia</strong>
+                            <div style="font-size:11px;color:var(--text-muted);">Demanda ≥ 500kW ou Grupo A com demanda ≥ 300kW</div>
+                        </div>
+                    </label>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg-input);border-radius:var(--radius-sm);cursor:pointer;">
+                        <input type="checkbox" id="energia-check-capacitor" onchange="calcularEnergia()" style="width:18px;height:18px;accent-color:var(--ez-orange);">
+                        <div>
+                            <strong style="font-size:13px;">Necessita banco de capacitores</strong>
+                            <div style="font-size:11px;color:var(--text-muted);">Fator de potência abaixo de 0,92</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- RESULTADO ENERGIA -->
+            <div class="resultado-card hidden" id="resultado-energia">
+                <div class="resultado-header">
+                    <div class="r-icon bg-warning-light c-warning"><i class="fas fa-bolt"></i></div>
+                    <div>
+                        <h3>Resultado — Energia Elétrica</h3>
+                        <p style="font-size:12px;color:var(--text-muted);">Oportunidades de redução identificadas</p>
+                    </div>
+                </div>
+                <div class="resultado-grid" id="resultado-energia-grid"></div>
+                <div style="margin-top:20px;" id="resultado-energia-alertas"></div>
+            </div>
+
+            <div style="display:flex;gap:12px;margin-top:8px;">
+                <button class="btn-ez primary" onclick="salvarEnergia()"><i class="fas fa-save"></i> Salvar Energia</button>
+                <button class="btn-ez success" onclick="calcularEnergia(); document.getElementById('resultado-energia').classList.remove('hidden');">
+                    <i class="fas fa-calculator"></i> Calcular Savings
+                </button>
+                <button class="btn-ez secondary" onclick="limparEnergia()"><i class="fas fa-eraser"></i> Limpar</button>
+            </div>
+        </div>
+    </div>
+    <!-- ========================================== -->
+    <!-- FORM: RH & PESSOAS (FUNCIONAL)              -->
+    <!-- ========================================== -->
+    <div class="page-section" id="page-form-rh">
+        <div class="page-content">
+            <div class="module-page-header" style="border-left:4px solid var(--success);">
+                <div class="mph-content">
+                    <div class="mph-icon bg-success-light c-success" style="font-size:32px;"><i class="fas fa-users"></i></div>
+                    <div class="mph-info">
+                        <h2>RH & <span>Pessoas</span></h2>
+                        <p>Turnover, horas extras, treinamento, clima organizacional</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-user-minus" style="color:var(--danger);"></i> Turnover & Rotatividade</h3>
+                <div class="form-row form-row-4">
+                    <div class="form-field">
+                        <label>Total Colaboradores</label>
+                        <input type="number" id="rh-colaboradores" placeholder="Ex: 248" oninput="calcularRH()">
+                    </div>
+                    <div class="form-field">
+                        <label>Admissões (12 meses)</label>
+                        <input type="number" id="rh-admissoes" placeholder="Ex: 86" oninput="calcularRH()">
+                    </div>
+                    <div class="form-field">
+                        <label>Demissões (12 meses)</label>
+                        <input type="number" id="rh-demissoes" placeholder="Ex: 72" oninput="calcularRH()">
+                    </div>
+                    <div class="form-field">
+                        <label>Taxa Turnover (%)</label>
+                        <input type="text" id="rh-turnover" readonly value="--">
+                        <div class="field-hint">Calculado automaticamente</div>
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Custo Médio por Demissão (R$)</label>
+                        <input type="number" id="rh-custo-demissao" placeholder="Ex: 8500" step="100" oninput="calcularRH()">
+                        <div class="field-hint">Rescisão + recrutamento + treinamento</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Custo Total Turnover (R$/ano)</label>
+                        <input type="text" id="rh-custo-turnover" readonly value="--">
+                    </div>
+                    <div class="form-field">
+                        <label>Benchmark Turnover Setor (%)</label>
+                        <input type="number" id="rh-turnover-bench" value="2.8" step="0.1" oninput="calcularRH()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-clock" style="color:var(--warning);"></i> Horas Extras</h3>
+                <div class="form-row form-row-4">
+                    <div class="form-field">
+                        <label>Total HE Mensal (horas)</label>
+                        <input type="number" id="rh-he-mensal" placeholder="Ex: 3200" oninput="calcularRH()">
+                    </div>
+                    <div class="form-field">
+                        <label>Custo Médio HE (R$/hora)</label>
+                        <input type="number" id="rh-he-custo" placeholder="Ex: 32" step="1" oninput="calcularRH()">
+                        <div class="field-hint">Hora normal × 1.5 ou 2.0</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Custo HE Mensal (R$)</label>
+                        <input type="text" id="rh-he-custo-mensal" readonly value="--">
+                    </div>
+                    <div class="form-field">
+                        <label>Custo HE Anual (R$)</label>
+                        <input type="text" id="rh-he-custo-anual" readonly value="--">
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>% HE sem Justificativa</label>
+                        <input type="number" id="rh-he-sem-justif" placeholder="Ex: 35" step="1" oninput="calcularRH()">
+                        <div class="field-hint">HE que poderiam ser evitadas</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Perda HE Desnecessária (R$/ano)</label>
+                        <input type="text" id="rh-he-perda" readonly value="--">
+                    </div>
+                    <div class="form-field">
+                        <label>HE / Colaborador (h/mês)</label>
+                        <input type="text" id="rh-he-per-capita" readonly value="--">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-graduation-cap" style="color:var(--info);"></i> Treinamento & Clima</h3>
+                <div class="form-row form-row-4">
+                    <div class="form-field">
+                        <label>Horas Treinamento/Colab/Ano</label>
+                        <input type="number" id="rh-treinamento" placeholder="Ex: 12" step="1" oninput="calcularRH()">
+                        <div class="field-hint">Benchmark: 40h/ano</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Investimento T&D (R$/ano)</label>
+                        <input type="number" id="rh-investimento-td" placeholder="Ex: 45000" step="1000" oninput="calcularRH()">
+                    </div>
+                    <div class="form-field">
+                        <label>eNPS (Employee NPS)</label>
+                        <input type="number" id="rh-enps" placeholder="Ex: 32" step="1" oninput="calcularRH()">
+                        <div class="field-hint">De -100 a +100. Bom: >50</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Pesquisa de Clima (%)</label>
+                        <input type="number" id="rh-clima" placeholder="Ex: 68" step="1" oninput="calcularRH()">
+                        <div class="field-hint">Satisfação geral. Bom: >75%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESULTADO RH -->
+            <div class="resultado-card hidden" id="resultado-rh">
+                <div class="resultado-header">
+                    <div class="r-icon bg-success-light c-success"><i class="fas fa-users"></i></div>
+                    <div>
+                        <h3>Resultado — RH & Pessoas</h3>
+                        <p style="font-size:12px;color:var(--text-muted);">Perdas e oportunidades em gestão de pessoas</p>
+                    </div>
+                </div>
+                <div class="resultado-grid" id="resultado-rh-grid"></div>
+                <div style="margin-top:20px;" id="resultado-rh-alertas"></div>
+            </div>
+
+            <div style="display:flex;gap:12px;margin-top:8px;">
+                <button class="btn-ez primary" onclick="salvarRH()"><i class="fas fa-save"></i> Salvar RH</button>
+                <button class="btn-ez success" onclick="calcularRH(); document.getElementById('resultado-rh').classList.remove('hidden');">
+                    <i class="fas fa-calculator"></i> Calcular Resultados
+                </button>
+                <button class="btn-ez secondary" onclick="limparRH()"><i class="fas fa-eraser"></i> Limpar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FORM: PRODUÇÃO & OEE (FUNCIONAL)            -->
+    <!-- ========================================== -->
+    <div class="page-section" id="page-form-producao">
+        <div class="page-content">
+            <div class="module-page-header" style="border-left:4px solid var(--ez-orange);">
+                <div class="mph-content">
+                    <div class="mph-icon bg-orange-light c-orange" style="font-size:32px;"><i class="fas fa-industry"></i></div>
+                    <div class="mph-info">
+                        <h2>Produção & <span>OEE</span></h2>
+                        <p>Disponibilidade, performance, qualidade, refugo e paradas</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-cogs" style="color:var(--ez-orange);"></i> OEE — Eficiência Global</h3>
+                <div class="alert-box info" style="margin-bottom:16px;">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>OEE = Disponibilidade × Performance × Qualidade.</strong> Benchmark: >85% (World Class)
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Tempo Programado (h/mês)</label>
+                        <input type="number" id="prod-tempo-prog" placeholder="Ex: 720" oninput="calcularProducao()">
+                        <div class="field-hint">Horas que deveria produzir</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Tempo Parado (h/mês)</label>
+                        <input type="number" id="prod-tempo-parado" placeholder="Ex: 86" oninput="calcularProducao()">
+                        <div class="field-hint">Setup + quebras + manutenção</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Disponibilidade (%)</label>
+                        <input type="text" id="prod-disponibilidade" readonly value="--">
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Produção Teórica (peças/mês)</label>
+                        <input type="number" id="prod-teorica" placeholder="Ex: 50000" oninput="calcularProducao()">
+                    </div>
+                    <div class="form-field">
+                        <label>Produção Real (peças/mês)</label>
+                        <input type="number" id="prod-real" placeholder="Ex: 38000" oninput="calcularProducao()">
+                    </div>
+                    <div class="form-field">
+                        <label>Performance (%)</label>
+                        <input type="text" id="prod-performance" readonly value="--">
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Peças Produzidas</label>
+                        <input type="number" id="prod-pecas-total" placeholder="Ex: 38000" oninput="calcularProducao()">
+                    </div>
+                    <div class="form-field">
+                        <label>Peças com Defeito (refugo)</label>
+                        <input type="number" id="prod-refugo" placeholder="Ex: 1634" oninput="calcularProducao()">
+                    </div>
+                    <div class="form-field">
+                        <label>Qualidade (%)</label>
+                        <input type="text" id="prod-qualidade" readonly value="--">
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>OEE Calculado (%)</label>
+                        <input type="text" id="prod-oee" readonly value="--" style="font-size:18px;">
+                    </div>
+                    <div class="form-field">
+                        <label>OEE Meta (%)</label>
+                        <input type="number" id="prod-oee-meta" value="85" step="1" oninput="calcularProducao()">
+                    </div>
+                    <div class="form-field">
+                        <label>Gap OEE (pp)</label>
+                        <input type="text" id="prod-gap-oee" readonly value="--">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-dollar-sign" style="color:var(--danger);"></i> Impacto Financeiro</h3>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Custo Médio por Peça (R$)</label>
+                        <input type="number" id="prod-custo-peca" placeholder="Ex: 12.50" step="0.01" oninput="calcularProducao()">
+                    </div>
+                    <div class="form-field">
+                        <label>Preço Médio de Venda (R$)</label>
+                        <input type="number" id="prod-preco-venda" placeholder="Ex: 28.00" step="0.01" oninput="calcularProducao()">
+                    </div>
+                    <div class="form-field">
+                        <label>Custo Hora Máquina (R$)</label>
+                        <input type="number" id="prod-custo-hora" placeholder="Ex: 180" step="10" oninput="calcularProducao()">
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Perda por Refugo (R$/mês)</label>
+                        <input type="text" id="prod-perda-refugo" readonly value="--">
+                    </div>
+                    <div class="form-field">
+                        <label>Perda por Paradas (R$/mês)</label>
+                        <input type="text" id="prod-perda-paradas" readonly value="--">
+                    </div>
+                    <div class="form-field">
+                        <label>Perda Total Produção (R$/ano)</label>
+                        <input type="text" id="prod-perda-total" readonly value="--">
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESULTADO PRODUÇÃO -->
+            <div class="resultado-card hidden" id="resultado-producao">
+                <div class="resultado-header">
+                    <div class="r-icon bg-orange-light c-orange"><i class="fas fa-industry"></i></div>
+                    <div>
+                        <h3>Resultado — Produção & OEE</h3>
+                        <p style="font-size:12px;color:var(--text-muted);">Eficiência e perdas produtivas</p>
+                    </div>
+                </div>
+                <div class="resultado-grid" id="resultado-producao-grid"></div>
+                <div style="margin-top:20px;" id="resultado-producao-alertas"></div>
+            </div>
+
+            <div style="display:flex;gap:12px;margin-top:8px;">
+                <button class="btn-ez primary" onclick="salvarProducao()"><i class="fas fa-save"></i> Salvar Produção</button>
+                <button class="btn-ez success" onclick="calcularProducao(); document.getElementById('resultado-producao').classList.remove('hidden');">
+                    <i class="fas fa-calculator"></i> Calcular OEE
+                </button>
+                <button class="btn-ez secondary" onclick="limparProducao()"><i class="fas fa-eraser"></i> Limpar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FORM: COMPRAS (FUNCIONAL)                   -->
+    <!-- ========================================== -->
+    <div class="page-section" id="page-form-compras">
+        <div class="page-content">
+            <div class="module-page-header" style="border-left:4px solid var(--success);">
+                <div class="mph-content">
+                    <div class="mph-icon bg-success-light c-success" style="font-size:32px;"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="mph-info">
+                        <h2>Compras & <span>Fornecedores</span></h2>
+                        <p>Sobrepreço, concentração, prazos e oportunidades de saving</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-boxes" style="color:var(--success);"></i> Volume de Compras</h3>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Total Compras Anuais (R$)</label>
+                        <input type="number" id="comp-total" placeholder="Ex: 12000000" step="10000" oninput="calcularCompras()">
+                    </div>
+                    <div class="form-field">
+                        <label>Nº de Fornecedores Ativos</label>
+                        <input type="number" id="comp-fornecedores" placeholder="Ex: 85" oninput="calcularCompras()">
+                    </div>
+                    <div class="form-field">
+                        <label>% Compras Top 3 Fornecedores</label>
+                        <input type="number" id="comp-concentracao" placeholder="Ex: 62" step="1" oninput="calcularCompras()">
+                        <div class="field-hint">Ideal: abaixo de 40%</div>
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>% Compras sem Cotação (3+)</label>
+                        <input type="number" id="comp-sem-cotacao" placeholder="Ex: 45" step="1" oninput="calcularCompras()">
+                        <div class="field-hint">% dos itens comprados sem 3 cotações</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Sobrepreço Estimado (%)</label>
+                        <input type="number" id="comp-sobrepreco" placeholder="Ex: 8" step="0.5" oninput="calcularCompras()">
+                        <div class="field-hint">Diferença vs. menor preço de mercado</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Perda por Sobrepreço (R$/ano)</label>
+                        <input type="text" id="comp-perda-sobrepreco" readonly value="--">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-handshake" style="color:var(--info);"></i> Negociação & Prazos</h3>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Prazo Médio Pagamento (dias)</label>
+                        <input type="number" id="comp-prazo-pgto" placeholder="Ex: 28" oninput="calcularCompras()">
+                    </div>
+                    <div class="form-field">
+                        <label>Prazo Médio Entrega (dias)</label>
+                        <input type="number" id="comp-prazo-entrega" placeholder="Ex: 15" oninput="calcularCompras()">
+                    </div>
+                    <div class="form-field">
+                        <label>% Entregas no Prazo</label>
+                        <input type="number" id="comp-sla" placeholder="Ex: 87" step="1" oninput="calcularCompras()">
+                        <div class="field-hint">Ideal: acima de 95%</div>
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Saving Potencial Negociação (%)</label>
+                        <input type="number" id="comp-saving-negociacao" placeholder="Ex: 5" step="0.5" oninput="calcularCompras()">
+                        <div class="field-hint">Estimativa de redução com renegociação</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Saving Estimado (R$/ano)</label>
+                        <input type="text" id="comp-saving-valor" readonly value="--">
+                    </div>
+                    <div class="form-field">
+                        <label>Total Perdas Compras (R$/ano)</label>
+                        <input type="text" id="comp-perda-total" readonly value="--">
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESULTADO COMPRAS -->
+            <div class="resultado-card hidden" id="resultado-compras">
+                <div class="resultado-header">
+                    <div class="r-icon bg-success-light c-success"><i class="fas fa-shopping-cart"></i></div>
+                    <div>
+                        <h3>Resultado — Compras & Fornecedores</h3>
+                        <p style="font-size:12px;color:var(--text-muted);">Sobrepreço e oportunidades de saving</p>
+                    </div>
+                </div>
+                <div class="resultado-grid" id="resultado-compras-grid"></div>
+                <div style="margin-top:20px;" id="resultado-compras-alertas"></div>
+            </div>
+
+            <div style="display:flex;gap:12px;margin-top:8px;">
+                <button class="btn-ez primary" onclick="salvarCompras()"><i class="fas fa-save"></i> Salvar Compras</button>
+                <button class="btn-ez success" onclick="calcularCompras(); document.getElementById('resultado-compras').classList.remove('hidden');">
+                    <i class="fas fa-calculator"></i> Calcular Savings
+                </button>
+                <button class="btn-ez secondary" onclick="limparCompras()"><i class="fas fa-eraser"></i> Limpar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- FORM: FINANCEIRO (FUNCIONAL)                -->
+    <!-- ========================================== -->
+    <div class="page-section" id="page-form-financeiro">
+        <div class="page-content">
+            <div class="module-page-header" style="border-left:4px solid var(--warning);">
+                <div class="mph-content">
+                    <div class="mph-icon bg-warning-light c-warning" style="font-size:32px;"><i class="fas fa-dollar-sign"></i></div>
+                    <div class="mph-info">
+                        <h2>Financeiro & <span>Tesouraria</span></h2>
+                        <p>Inadimplência, juros, taxas bancárias e gestão de caixa</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-money-check-alt" style="color:var(--warning);"></i> Contas a Receber & Inadimplência</h3>
+                <div class="form-row form-row-4">
+                    <div class="form-field">
+                        <label>Faturamento Mensal (R$)</label>
+                        <input type="number" id="fin-faturamento" placeholder="Ex: 4000000" step="10000" oninput="calcularFinanceiro()">
+                    </div>
+                    <div class="form-field">
+                        <label>Carteira a Receber (R$)</label>
+                        <input type="number" id="fin-carteira" placeholder="Ex: 3200000" step="10000" oninput="calcularFinanceiro()">
+                    </div>
+                    <div class="form-field">
+                        <label>Inadimplência (R$)</label>
+                        <input type="number" id="fin-inadimplencia" placeholder="Ex: 152000" step="1000" oninput="calcularFinanceiro()">
+                    </div>
+                    <div class="form-field">
+                        <label>Taxa Inadimplência (%)</label>
+                        <input type="text" id="fin-taxa-inadimplencia" readonly value="--">
+                        <div class="field-hint">Ideal: abaixo de 3%</div>
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Prazo Médio Recebimento (dias)</label>
+                        <input type="number" id="fin-pmr" placeholder="Ex: 42" oninput="calcularFinanceiro()">
+                    </div>
+                    <div class="form-field">
+                        <label>Prazo Médio Pagamento (dias)</label>
+                        <input type="number" id="fin-pmp" placeholder="Ex: 28" oninput="calcularFinanceiro()">
+                    </div>
+                    <div class="form-field">
+                        <label>Ciclo Financeiro (dias)</label>
+                        <input type="text" id="fin-ciclo" readonly value="--">
+                        <div class="field-hint">PMR - PMP (ideal: negativo)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-university" style="color:var(--purple);"></i> Custos Bancários & Financeiros</h3>
+                <div class="form-row form-row-4">
+                    <div class="form-field">
+                        <label>Juros Pagos (R$/ano)</label>
+                        <input type="number" id="fin-juros" placeholder="Ex: 180000" step="1000" oninput="calcularFinanceiro()">
+                    </div>
+                    <div class="form-field">
+                        <label>Tarifas Bancárias (R$/ano)</label>
+                        <input type="number" id="fin-tarifas" placeholder="Ex: 42000" step="1000" oninput="calcularFinanceiro()">
+                    </div>
+                    <div class="form-field">
+                        <label>Multas/Juros por Atraso (R$/ano)</label>
+                        <input type="number" id="fin-multas" placeholder="Ex: 28000" step="1000" oninput="calcularFinanceiro()">
+                    </div>
+                    <div class="form-field">
+                        <label>Total Custos Financeiros (R$/ano)</label>
+                        <input type="text" id="fin-total-custos" readonly value="--">
+                    </div>
+                </div>
+                <div class="form-row form-row-3">
+                    <div class="form-field">
+                        <label>Taxa Média Empréstimos (%/ano)</label>
+                        <input type="number" id="fin-taxa-emprestimo" placeholder="Ex: 18.5" step="0.1" oninput="calcularFinanceiro()">
+                    </div>
+                    <div class="form-field">
+                        <label>Saldo em Empréstimos (R$)</label>
+                        <input type="number" id="fin-saldo-emprestimo" placeholder="Ex: 1200000" step="10000" oninput="calcularFinanceiro()">
+                    </div>
+                    <div class="form-field">
+                        <label>Taxa Benchmark (%/ano)</label>
+                        <input type="number" id="fin-taxa-bench" value="14.0" step="0.1" oninput="calcularFinanceiro()">
+                        <div class="field-hint">Taxa média de mercado</div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>Perda por Taxa Acima Mercado (R$/ano)</label>
+                        <input type="text" id="fin-perda-taxa" readonly value="--">
+                    </div>
+                    <div class="form-field">
+                        <label>Total Perdas Financeiras (R$/ano)</label>
+                        <input type="text" id="fin-perda-total" readonly value="--">
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESULTADO FINANCEIRO -->
+            <div class="resultado-card hidden" id="resultado-financeiro">
+                <div class="resultado-header">
+                    <div class="r-icon bg-warning-light c-warning"><i class="fas fa-dollar-sign"></i></div>
+                    <div>
+                        <h3>Resultado — Financeiro & Tesouraria</h3>
+                        <p style="font-size:12px;color:var(--text-muted);">Custos financeiros e oportunidades de redução</p>
+                    </div>
+                </div>
+                <div class="resultado-grid" id="resultado-financeiro-grid"></div>
+                <div style="margin-top:20px;" id="resultado-financeiro-alertas"></div>
+            </div>
+
+            <div style="display:flex;gap:12px;margin-top:8px;">
+                <button class="btn-ez primary" onclick="salvarFinanceiro()"><i class="fas fa-save"></i> Salvar Financeiro</button>
+                <button class="btn-ez success" onclick="calcularFinanceiro(); document.getElementById('resultado-financeiro').classList.remove('hidden');">
+                    <i class="fas fa-calculator"></i> Calcular Resultados
+                </button>
+                <button class="btn-ez secondary" onclick="limparFinanceiro()"><i class="fas fa-eraser"></i> Limpar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PAGE: RESULTADO GERAL                       -->
+    <!-- ========================================== -->
+    <div class="page-section" id="page-resultado-geral">
+        <div class="page-content">
+            <div class="module-page-header" style="border-left:4px solid var(--ez-orange);">
+                <div class="mph-content">
+                    <div class="mph-icon bg-orange-light c-orange" style="font-size:32px;"><i class="fas fa-tachometer-alt"></i></div>
+                    <div class="mph-info">
+                        <h2>Resultado <span>Geral</span></h2>
+                        <p>Consolidação de todas as perdas e oportunidades identificadas</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="resultado-geral-content">
+                <div class="alert-box warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Preencha os formulários primeiro!</strong> Os resultados serão calculados automaticamente após a entrada de dados.
+                </div>
+            </div>
+
+            <div class="kpi-grid hidden" id="resultado-geral-kpis">
+                <div class="kpi-card">
+                    <div class="kpi-top"><div class="kpi-icon bg-danger-light c-danger"><i class="fas fa-exclamation-triangle"></i></div></div>
+                    <div class="kpi-value c-danger" id="rg-perdas-total">R$ 0</div>
+                    <div class="kpi-label">Total de Perdas Identificadas</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-top"><div class="kpi-icon bg-success-light c-success"><i class="fas fa-hand-holding-usd"></i></div></div>
+                    <div class="kpi-value c-success" id="rg-saving-total">R$ 0</div>
+                    <div class="kpi-label">Saving Potencial</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-top"><div class="kpi-icon bg-orange-light c-orange"><i class="fas fa-award"></i></div></div>
+                    <div class="kpi-value c-orange" id="rg-score">--</div>
+                    <div class="kpi-label">Score EZ (0-100)</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-top"><div class="kpi-icon bg-info-light c-info"><i class="fas fa-percentage"></i></div></div>
+                    <div class="kpi-value c-info" id="rg-perc-faturamento">--%</div>
+                    <div class="kpi-label">% Perdas vs Faturamento</div>
+                </div>
+            </div>
+
+            <div class="ez-card hidden" id="resultado-geral-detalhes">
+                <div class="card-header-ez"><h3><i class="fas fa-list-ol"></i> Perdas por Módulo</h3></div>
+                <div class="card-body-ez" style="padding:0;">
+                    <table class="ranking-table">
+                        <thead><tr><th>#</th><th>Módulo</th><th>Perda (R$/ano)</th><th>% do Total</th><th>Status</th></tr></thead>
+                        <tbody id="rg-tabela-body">
+                            <!-- Preenchido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div style="margin-top:20px;display:flex;gap:12px;">
+                <button class="btn-ez primary" onclick="calcularTudo()"><i class="fas fa-calculator"></i> Calcular Tudo</button>
+                <button class="btn-ez success" onclick="imprimirRelatorio()"><i class="fas fa-print"></i> Imprimir Relatório</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PAGE: MATRIZ DE PERDAS                      -->
+    <!-- ========================================== -->
+    <div class="page-section" id="page-matriz-perdas">
+        <div class="page-content">
+            <div class="module-page-header" style="border-left:4px solid var(--danger);">
+                <div class="mph-content">
+                    <div class="mph-icon bg-danger-light c-danger" style="font-size:32px;"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="mph-info">
+                        <h2>Matriz de <span>Perdas</span></h2>
+                        <p>Ranking completo das perdas por valor, calculado com seus dados</p>
+                    </div>
+                </div>
+            </div>
+            <div id="matriz-perdas-content">
+                <div class="alert-box warning"><i class="fas fa-exclamation-triangle"></i> Preencha os formulários para gerar a Matriz de Perdas automaticamente.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PAGE: SCORE EZ                              -->
+    <!-- ========================================== -->
+    <div class="page-section" id="page-score">
+        <div class="page-content">
+            <div class="module-page-header" style="border-left:4px solid var(--ez-orange);">
+                <div class="mph-content">
+                    <div class="mph-icon bg-orange-light c-orange" style="font-size:32px;"><i class="fas fa-award"></i></div>
+                    <div class="mph-info">
+                        <h2>Score <span>EZ</span></h2>
+                        <p>Nota de eficiência operacional calculada com base nos seus dados</p>
+                    </div>
+                </div>
+            </div>
+            <div id="score-content">
+                <div class="alert-box warning"><i class="fas fa-exclamation-triangle"></i> Preencha os formulários para calcular o Score EZ automaticamente.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PAGE: PRIORIZAÇÃO                           -->
+    <!-- ========================================== -->
+    <div class="page-section" id="page-priorizacao">
+        <div class="page-content">
+            <div class="module-page-header" style="border-left:4px solid var(--purple);">
+                <div class="mph-content">
+                    <div class="mph-icon bg-purple-light c-purple" style="font-size:32px;"><i class="fas fa-sort-amount-down"></i></div>
+                    <div class="mph-info">
+                        <h2>Motor de <span>Priorização</span></h2>
+                        <p>Ações ranqueadas por GUT × ROI × Impacto</p>
+                    </div>
+                </div>
+            </div>
+            <div id="priorizacao-content">
+                <div class="alert-box warning"><i class="fas fa-exclamation-triangle"></i> Preencha os formulários para gerar o ranking de priorização automaticamente.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PAGE: CONFIGURAÇÕES                         -->
+    <!-- ========================================== -->
+    <div class="page-section" id="page-config">
+        <div class="page-content">
+            <div class="module-page-header" style="border-left:4px solid var(--text-muted);">
+                <div class="mph-content">
+                    <div class="mph-icon" style="background:var(--bg-input);color:var(--text-muted);font-size:32px;"><i class="fas fa-cog"></i></div>
+                    <div class="mph-info">
+                        <h2>Configurações do <span>Sistema</span></h2>
+                        <p>Dados salvos, limpar base e exportar</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row-2">
+                <div class="form-card">
+                    <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-database" style="color:var(--info);"></i> Gerenciar Dados</h3>
+                    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">
+                        Todos os dados são salvos no <strong>localStorage</strong> do seu navegador. Isso significa que ficam armazenados mesmo se fechar a página.
+                    </p>
+                    <div style="display:flex;flex-direction:column;gap:12px;">
+                        <button class="btn-ez primary" onclick="exportarDados()"><i class="fas fa-download"></i> Exportar Dados (JSON)</button>
+                        <button class="btn-ez secondary" onclick="document.getElementById('importInput').click()"><i class="fas fa-upload"></i> Importar Dados (JSON)</button>
+                        <input type="file" id="importInput" accept=".json" style="display:none;" onchange="importarDados(event)">
+                        <button class="btn-ez danger" onclick="limparTudo()"><i class="fas fa-trash"></i> Limpar TODOS os Dados</button>
+                    </div>
+                </div>
+                <div class="form-card">
+                    <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;"><i class="fas fa-info-circle" style="color:var(--ez-orange);"></i> Sobre o Sistema</h3>
+                    <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;">
+                        <p><strong>EZ Audita Performance360</strong></p>
+                        <p>Versão: 2.0 Funcional</p>
+                        <p>Tipo: Aplicação Single-Page (SPA)</p>
+                        <p>Armazenamento: localStorage (navegador)</p>
+                        <p>Cálculos: JavaScript client-side</p>
+                        <br>
+                        <p><strong>Módulos disponíveis:</strong></p>
+                        <ul style="margin-left:20px;">
+                            <li>✅ Dados da Empresa</li>
+                            <li>✅ Saúde & Benefícios</li>
+                            <li>✅ Tributário & Fiscal</li>
+                            <li>✅ Energia Elétrica</li>
+                            <li>✅ RH & Pessoas</li>
+                            <li>✅ Produção & OEE</li>
+                            <li>✅ Compras & Fornecedores</li>
+                            <li>✅ Financeiro & Tesouraria</li>
+                            <li>✅ Resultado Geral</li>
+                            <li>✅ Matriz de Perdas</li>
+                            <li>✅ Score EZ</li>
+                            <li>✅ Motor de Priorização</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div><!-- FIM main-content -->
+<script>
+// ========== DADOS GLOBAIS ==========
+let DADOS = {empresa:{},saude:{},tributario:{},energia:{},rh:{},producao:{},compras:{},financeiro:{},perdas:{},score:0};
+
+function carregarDados(){const s=localStorage.getItem('ezaudita_dados');if(s){try{DADOS=JSON.parse(s);restaurarFormularios();atualizarStatusModulos();atualizarDashboard();}catch(e){}}}
+function salvarNoStorage(){localStorage.setItem('ezaudita_dados',JSON.stringify(DADOS));}
+
+// ========== FORMATAÇÃO ==========
+function fmt(v){if(!v||isNaN(v))return'R$ 0';return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:0,maximumFractionDigits:0});}
+function fmtD(v,d){if(v===null||v===undefined||isNaN(v))return'--';return v.toLocaleString('pt-BR',{minimumFractionDigits:d||1,maximumFractionDigits:d||1});}
+function fmtP(v){if(v===null||v===undefined||isNaN(v))return'--';return fmtD(v,1)+'%';}
+function getVal(id){const el=document.getElementById(id);if(!el)return 0;return parseFloat(el.value)||0;}
+function setVal(id,val){const el=document.getElementById(id);if(el)el.value=val;}
+function getCheck(id){const el=document.getElementById(id);return el?el.checked:false;}
+
+// ========== LOGIN ==========
+function handleLogin(e){
+    e.preventDefault();
+    const user=document.getElementById('loginUser').value.trim();
+    const pass=document.getElementById('loginPass').value.trim();
+    const perfil=document.getElementById('loginPerfil').value;
+    if(!user||!pass){document.getElementById('loginError').classList.add('show');return false;}
+    document.getElementById('loginError').classList.remove('show');
+    document.getElementById('userName').textContent=user;
+    document.getElementById('userPerfil').textContent=perfil;
+    document.getElementById('userAvatar').textContent=user.charAt(0).toUpperCase();
+    document.getElementById('loginScreen').classList.add('hidden');
+    carregarDados();
+    return false;
+}
+function handleLogout(){if(confirm('Sair do sistema?'))document.getElementById('loginScreen').classList.remove('hidden');}
+
+// ========== NAVEGAÇÃO ==========
+function toggleSidebar(){
+    const sb=document.getElementById('sidebar'),ov=document.getElementById('sidebarOverlay');
+    if(window.innerWidth<=768){sb.classList.toggle('mobile-open');ov.classList.toggle('show');}
+    else sb.classList.toggle('collapsed');
+}
+function toggleNavGroup(id){document.getElementById(id).classList.toggle('open');}
+function navigateTo(page,el){
+    document.querySelectorAll('.page-section').forEach(p=>p.classList.remove('active'));
+    const t=document.getElementById('page-'+page);if(t)t.classList.add('active');
+    if(el){document.querySelectorAll('.nav-link-ez').forEach(l=>l.classList.remove('active'));el.classList.add('active');}
+    const titles={'dashboard':'Dashboard','form-empresa':'Dados da Empresa','form-saude':'Saúde & Benefícios','form-tributario':'Tributário & Fiscal','form-energia':'Energia Elétrica','form-rh':'RH & Pessoas','form-producao':'Produção & OEE','form-compras':'Compras & Fornecedores','form-financeiro':'Financeiro & Tesouraria','resultado-geral':'Resultado Geral','matriz-perdas':'Matriz de Perdas','score':'Score EZ','priorizacao':'Priorização','config':'Configurações'};
+    document.getElementById('pageTitle').textContent=titles[page]||page;
+    document.getElementById('pageBreadcrumb').textContent='EZ Audita / '+(titles[page]||page);
+    if(window.innerWidth<=768){document.getElementById('sidebar').classList.remove('mobile-open');document.getElementById('sidebarOverlay').classList.remove('show');}
+    window.scrollTo(0,0);
+}
+
+// ========== EMPRESA ==========
+function salvarEmpresa(){
+    DADOS.empresa={cnpj:document.getElementById('emp-cnpj').value,razao:document.getElementById('emp-razao').value,segmento:document.getElementById('emp-segmento').value,regime:document.getElementById('emp-regime').value,uf:document.getElementById('emp-uf').value,faturamento:getVal('emp-faturamento'),lucro:getVal('emp-lucro'),colaboradores:getVal('emp-colaboradores'),folha:getVal('emp-folha'),responsavel:document.getElementById('emp-responsavel').value,cargo:document.getElementById('emp-cargo').value,email:document.getElementById('emp-email').value};
+    if(DADOS.empresa.faturamento>0&&DADOS.empresa.lucro>0){DADOS.empresa.margem=(DADOS.empresa.lucro/DADOS.empresa.faturamento)*100;setVal('emp-margem',fmtP(DADOS.empresa.margem));}
+    if(DADOS.empresa.folha>0){DADOS.empresa.folhaAnual=DADOS.empresa.folha*13.33;setVal('emp-folha-anual',fmt(DADOS.empresa.folhaAnual));}
+    salvarNoStorage();atualizarStatusModulos();alert('✅ Empresa salva!');
+}
+['emp-faturamento','emp-lucro','emp-folha'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',function(){const f=getVal('emp-faturamento'),l=getVal('emp-lucro'),fo=getVal('emp-folha');if(f>0&&l>0)setVal('emp-margem',fmtP((l/f)*100));if(fo>0)setVal('emp-folha-anual',fmt(fo*13.33));});});
+
+// ========== SAÚDE ==========
+function calcularSaude(){
+    const vidas=getVal('saude-vidas'),mensal=getVal('saude-mensal'),sinist=getVal('saude-sinistralidade'),sinistMeta=getVal('saude-sinistralidade-meta')||75,reaj=getVal('saude-reajuste'),vcmh=getVal('saude-vcmh'),atestados=getVal('saude-atestados'),diasP=getVal('saude-dias-perdidos'),custoDia=getVal('saude-custo-dia'),colabs=DADOS.empresa.colaboradores||vidas||1,folha=DADOS.empresa.folha||0;
+    if(vidas>0&&mensal>0)setVal('saude-percapita',fmt(mensal/vidas));
+    if(mensal>0)setVal('saude-anual',fmt(mensal*12));
+    if(mensal>0&&folha>0)setVal('saude-perc-folha',fmtP((mensal/folha)*100));
+    let reajExc=0,perdaReaj=0,perdaSinist=0,custoAbs=0;
+    if(reaj>0&&vcmh>0){reajExc=reaj-vcmh;setVal('saude-reajuste-excedente',fmtP(reajExc));}
+    if(reajExc>0&&mensal>0){perdaReaj=(reajExc/100)*mensal*12;setVal('saude-perda-reajuste',fmt(perdaReaj));const h=document.getElementById('saude-perda-reajuste-hint');if(h)h.textContent='⚠️ Reajuste '+fmtD(reajExc,1)+'pp acima do VCMH';}
+    if(sinist>sinistMeta&&mensal>0){perdaSinist=((sinist-sinistMeta)/100)*mensal*12;setVal('saude-perda-sinistralidade',fmt(perdaSinist));const h=document.getElementById('saude-perda-sinist-hint');if(h)h.textContent='⚠️ Sinistralidade '+fmtD(sinist-sinistMeta,1)+'pp acima da meta';}
+    if(diasP>0&&custoDia>0){custoAbs=diasP*custoDia;setVal('saude-custo-absenteismo',fmt(custoAbs));}
+    if(diasP>0&&colabs>0)setVal('saude-taxa-absenteismo',fmtP((diasP/(colabs*252))*100));
+    if(atestados>0&&colabs>0)setVal('saude-media-atestados',fmtD(atestados/colabs,1));
+    if(atestados>0){['1','2','3'].forEach(n=>{const q=getVal('saude-causa'+n+'-qtd');if(q>0)setVal('saude-causa'+n+'-perc',fmtP((q/atestados)*100));});}
+    const perdaTotal=perdaReaj+perdaSinist+custoAbs;
+    DADOS.saude={perdaReajuste:perdaReaj,perdaSinistralidade:perdaSinist,custoAbsenteismo:custoAbs,perdaTotal:perdaTotal,sinistralidade:sinist,mensal:mensal,vidas:vidas};
+    DADOS.perdas.saude=perdaTotal;salvarNoStorage();
+    const grid=document.getElementById('resultado-saude-grid');
+    if(grid)grid.innerHTML='<div class="resultado-item"><div class="r-val c-danger">'+fmt(perdaReaj)+'</div><div class="r-lbl">Perda Reajuste</div></div><div class="resultado-item"><div class="r-val c-warning">'+fmt(perdaSinist)+'</div><div class="r-lbl">Perda Sinistralidade</div></div><div class="resultado-item"><div class="r-val c-purple">'+fmt(custoAbs)+'</div><div class="r-lbl">Custo Absenteísmo</div></div><div class="resultado-item"><div class="r-val c-danger" style="font-size:26px;">'+fmt(perdaTotal)+'</div><div class="r-lbl">TOTAL PERDAS SAÚDE</div></div>';
+    const al=document.getElementById('resultado-saude-alertas');
+    if(al){let h='';if(reajExc>2)h+='<div class="alert-box danger"><i class="fas fa-exclamation-circle"></i> Reajuste '+fmtD(reajExc,1)+'pp acima do VCMH</div>';if(sinist>80)h+='<div class="alert-box warning"><i class="fas fa-chart-line"></i> Sinistralidade '+fmtP(sinist)+'</div>';if(custoAbs>100000)h+='<div class="alert-box warning"><i class="fas fa-user-injured"></i> Absenteísmo '+fmt(custoAbs)+'</div>';if(perdaTotal>0)h+='<div class="alert-box success"><i class="fas fa-lightbulb"></i> Saving potencial: <strong>'+fmt(perdaTotal*0.6)+'</strong></div>';al.innerHTML=h;}
+}
+function salvarSaude(){calcularSaude();atualizarStatusModulos();atualizarDashboard();alert('✅ Saúde salvo!');}
+
+// ========== TRIBUTÁRIO ==========
+function calcularTributario(){
+    const icms=getVal('trib-icms'),pis=getVal('trib-pis'),cofins=getVal('trib-cofins'),irpj=getVal('trib-irpj'),inss=getVal('trib-inss'),rat=getVal('trib-rat'),ratMeta=getVal('trib-rat-meta')||1,insumos=getVal('trib-insumos'),folhaA=getVal('trib-folha-anual'),fat=DADOS.empresa.faturamento||0;
+    const total=icms+pis+cofins+irpj+inss;setVal('trib-total',fmt(total));
+    if(fat>0&&total>0)setVal('trib-carga',fmtP((total/fat)*100));
+    let perdaT=0,creditos=[];
+    if(getCheck('trib-check-icms-pis')&&icms>0){const c=(pis+cofins)*0.15*5;creditos.push({nome:'Exclusão ICMS base PIS/COFINS',valor:c,roi:'12x'});perdaT+=c;}
+    if(getCheck('trib-check-creditos-insumo')&&insumos>0){const c=insumos*0.0925*5;creditos.push({nome:'Créditos PIS/COFINS insumos',valor:c,roi:'9x'});perdaT+=c;}
+    if(getCheck('trib-check-rat')&&folhaA>0&&rat>ratMeta){const c=folhaA*((rat-ratMeta)/100);creditos.push({nome:'Correção RAT/FAP',valor:c,roi:'8x'});perdaT+=c;}
+    if(getCheck('trib-check-regime')&&total>0){const c=total*0.05;creditos.push({nome:'Revisão regime tributário',valor:c,roi:'4x'});perdaT+=c;}
+    DADOS.tributario={perdaTotal:perdaT,creditos:creditos,totalTributos:total};DADOS.perdas.tributario=perdaT;salvarNoStorage();
+    const grid=document.getElementById('resultado-tributario-grid');
+    if(grid){let h='<div class="resultado-item"><div class="r-val c-purple">'+fmt(total)+'</div><div class="r-lbl">Total Tributos</div></div>';creditos.forEach(c=>{h+='<div class="resultado-item"><div class="r-val c-success">'+fmt(c.valor)+'</div><div class="r-lbl">'+c.nome+'</div></div>';});h+='<div class="resultado-item"><div class="r-val c-success" style="font-size:26px;">'+fmt(perdaT)+'</div><div class="r-lbl">TOTAL CRÉDITOS</div></div>';grid.innerHTML=h;}
+    const al=document.getElementById('resultado-tributario-alertas');if(al){let h='';creditos.forEach(c=>{h+='<div class="alert-box success"><i class="fas fa-check-circle"></i> <strong>'+c.nome+':</strong> '+fmt(c.valor)+' — ROI: '+c.roi+'</div>';});al.innerHTML=h;}
+}
+function salvarTributario(){calcularTributario();atualizarStatusModulos();atualizarDashboard();alert('✅ Tributário salvo!');}
+
+// ========== ENERGIA ==========
+function calcularEnergia(){
+    const demC=getVal('energia-demanda-contratada'),demM=getVal('energia-demanda-medida'),valMes=getVal('energia-valor-mensal'),multaR=getVal('energia-multa-reativa');
+    if(valMes>0)setVal('energia-custo-anual',fmt(valMes*12));
+    let exc=0;if(demC>0&&demM>0){exc=((demC-demM)/demC)*100;setVal('energia-excedente-demanda',fmtP(exc));}
+    let perdaT=0,perdaD=0,perdaR=0,savML=0;
+    if(exc>10&&valMes>0){perdaD=valMes*(exc/100)*0.6*12;perdaT+=perdaD;}
+    if(multaR>0){perdaR=multaR*12;perdaT+=perdaR;}
+    if(getCheck('energia-check-ml')&&valMes>0){savML=valMes*0.25*12;perdaT+=savML;}
+    DADOS.energia={perdaTotal:perdaT,perdaDemanda:perdaD,perdaReativa:perdaR,savingML:savML};DADOS.perdas.energia=perdaT;salvarNoStorage();
+    const grid=document.getElementById('resultado-energia-grid');
+    if(grid)grid.innerHTML='<div class="resultado-item"><div class="r-val c-warning">'+fmt(valMes*12)+'</div><div class="r-lbl">Custo Anual</div></div><div class="resultado-item"><div class="r-val c-danger">'+fmt(perdaD)+'</div><div class="r-lbl">Perda Demanda</div></div><div class="resultado-item"><div class="r-val c-danger">'+fmt(perdaR)+'</div><div class="r-lbl">Perda Reativos</div></div><div class="resultado-item"><div class="r-val c-success">'+fmt(savML)+'</div><div class="r-lbl">Saving ML</div></div><div class="resultado-item"><div class="r-val c-success" style="font-size:26px;">'+fmt(perdaT)+'</div><div class="r-lbl">TOTAL SAVING</div></div>';
+    const al=document.getElementById('resultado-energia-alertas');if(al){let h='';if(exc>10)h+='<div class="alert-box danger"><i class="fas fa-exclamation-circle"></i> Demanda '+fmtP(exc)+' excedente</div>';if(multaR>0)h+='<div class="alert-box warning"><i class="fas fa-bolt"></i> Reativos '+fmt(perdaR)+'/ano</div>';if(savML>0)h+='<div class="alert-box success"><i class="fas fa-solar-panel"></i> ML saving '+fmt(savML)+'/ano</div>';al.innerHTML=h;}
+}
+function salvarEnergia(){calcularEnergia();atualizarStatusModulos();atualizarDashboard();alert('✅ Energia salvo!');}
+
+// ========== RH ==========
+function calcularRH(){
+    const col=getVal('rh-colaboradores'),adm=getVal('rh-admissoes'),dem=getVal('rh-demissoes'),cDem=getVal('rh-custo-demissao'),tb=getVal('rh-turnover-bench')||2.8,heM=getVal('rh-he-mensal'),heC=getVal('rh-he-custo'),heSJ=getVal('rh-he-sem-justif');
+    let turn=0;if(col>0&&dem>0){turn=((adm+dem)/2/col)*100;setVal('rh-turnover',fmtP(turn));}
+    let cTurn=0;if(dem>0&&cDem>0){cTurn=dem*cDem;setVal('rh-custo-turnover',fmt(cTurn));}
+    let heCM=0,heCA=0,heP=0;
+    if(heM>0&&heC>0){heCM=heM*heC;heCA=heCM*12;setVal('rh-he-custo-mensal',fmt(heCM));setVal('rh-he-custo-anual',fmt(heCA));}
+    if(heSJ>0&&heCA>0){heP=heCA*(heSJ/100);setVal('rh-he-perda',fmt(heP));}
+    if(col>0&&heM>0)setVal('rh-he-per-capita',fmtD(heM/col,1)+'h');
+    let pTurn=0;if(turn>tb&&col>0&&cDem>0)pTurn=col*((turn-tb)/100)*cDem;
+    const perdaT=pTurn+heP;
+    DADOS.rh={perdaTotal:perdaT,perdaTurnover:pTurn,hePerda:heP,turnover:turn,custoTurnover:cTurn};DADOS.perdas.rh=perdaT;salvarNoStorage();
+    const grid=document.getElementById('resultado-rh-grid');
+    if(grid)grid.innerHTML='<div class="resultado-item"><div class="r-val c-danger">'+fmtP(turn)+'</div><div class="r-lbl">Turnover</div></div><div class="resultado-item"><div class="r-val c-danger">'+fmt(pTurn)+'</div><div class="r-lbl">Perda Turnover</div></div><div class="resultado-item"><div class="r-val c-warning">'+fmt(heP)+'</div><div class="r-lbl">Perda HE</div></div><div class="resultado-item"><div class="r-val c-danger" style="font-size:26px;">'+fmt(perdaT)+'</div><div class="r-lbl">TOTAL PERDAS RH</div></div>';
+    const al=document.getElementById('resultado-rh-alertas');if(al){let h='';if(turn>5)h+='<div class="alert-box danger"><i class="fas fa-user-minus"></i> Turnover CRÍTICO: '+fmtP(turn)+'</div>';if(heSJ>30)h+='<div class="alert-box warning"><i class="fas fa-clock"></i> '+heSJ+'% HE sem justificativa</div>';al.innerHTML=h;}
+}
+function salvarRH(){calcularRH();atualizarStatusModulos();atualizarDashboard();alert('✅ RH salvo!');}
+
+// ========== PRODUÇÃO ==========
+function calcularProducao(){
+    const tP=getVal('prod-tempo-prog'),tPa=getVal('prod-tempo-parado'),pT=getVal('prod-teorica'),pR=getVal('prod-real'),pec=getVal('prod-pecas-total'),ref=getVal('prod-refugo'),meta=getVal('prod-oee-meta')||85,cPe=getVal('prod-custo-peca'),cHo=getVal('prod-custo-hora');
+    let disp=0,perf=0,qual=0,oee=0;
+    if(tP>0){disp=((tP-tPa)/tP)*100;setVal('prod-disponibilidade',fmtP(disp));}
+    if(pT>0&&pR>0){perf=(pR/pT)*100;setVal('prod-performance',fmtP(perf));}
+    if(pec>0){qual=((pec-ref)/pec)*100;setVal('prod-qualidade',fmtP(qual));}
+    if(disp>0&&perf>0&&qual>0){oee=(disp/100)*(perf/100)*(qual/100)*100;setVal('prod-oee',fmtP(oee));setVal('prod-gap-oee',fmtD(oee-meta,1)+'pp');}
+    let pRef=0,pPar=0;
+    if(ref>0&&cPe>0){pRef=ref*cPe;setVal('prod-perda-refugo',fmt(pRef));}
+    if(tPa>0&&cHo>0){pPar=tPa*cHo;setVal('prod-perda-paradas',fmt(pPar));}
+    const perdaT=(pRef+pPar)*12;setVal('prod-perda-total',fmt(perdaT));
+    DADOS.producao={perdaTotal:perdaT,oee:oee,perdaRefugo:pRef*12,perdaParadas:pPar*12,disp:disp,perf:perf,qual:qual};DADOS.perdas.producao=perdaT;salvarNoStorage();
+    const grid=document.getElementById('resultado-producao-grid');
+    if(grid){const cor=oee>=85?'c-success':oee>=70?'c-warning':'c-danger';grid.innerHTML='<div class="resultado-item"><div class="r-val '+cor+'" style="font-size:30px;">'+fmtP(oee)+'</div><div class="r-lbl">OEE</div></div><div class="resultado-item"><div class="r-val c-info">'+fmtP(disp)+'</div><div class="r-lbl">Disponibilidade</div></div><div class="resultado-item"><div class="r-val c-warning">'+fmtP(perf)+'</div><div class="r-lbl">Performance</div></div><div class="resultado-item"><div class="r-val c-success">'+fmtP(qual)+'</div><div class="r-lbl">Qualidade</div></div><div class="resultado-item"><div class="r-val c-danger">'+fmt(pRef*12)+'</div><div class="r-lbl">Refugo/Ano</div></div><div class="resultado-item"><div class="r-val c-danger">'+fmt(pPar*12)+'</div><div class="r-lbl">Paradas/Ano</div></div><div class="resultado-item"><div class="r-val c-danger" style="font-size:26px;">'+fmt(perdaT)+'</div><div class="r-lbl">TOTAL</div></div>';}
+    const al=document.getElementById('resultado-producao-alertas');if(al){let h='';if(oee>0&&oee<65)h+='<div class="alert-box danger"><i class="fas fa-industry"></i> OEE CRÍTICO: '+fmtP(oee)+'</div>';else if(oee>0&&oee<85)h+='<div class="alert-box warning"><i class="fas fa-industry"></i> OEE abaixo meta: '+fmtP(oee)+'</div>';al.innerHTML=h;}
+}
+function salvarProducao(){calcularProducao();atualizarStatusModulos();atualizarDashboard();alert('✅ Produção salvo!');}
+
+// ========== COMPRAS ==========
+function calcularCompras(){
+    const tot=getVal('comp-total'),sC=getVal('comp-sem-cotacao'),sp=getVal('comp-sobrepreco'),sN=getVal('comp-saving-negociacao');
+    let pS=0,sV=0;
+    if(tot>0&&sp>0&&sC>0){pS=tot*(sC/100)*(sp/100);setVal('comp-perda-sobrepreco',fmt(pS));}
+    if(tot>0&&sN>0){sV=tot*(sN/100);setVal('comp-saving-valor',fmt(sV));}
+    const perdaT=pS+sV;setVal('comp-perda-total',fmt(perdaT));
+    DADOS.compras={perdaTotal:perdaT,perdaSobrepreco:pS,savingValor:sV};DADOS.perdas.compras=perdaT;salvarNoStorage();
+    const grid=document.getElementById('resultado-compras-grid');
+    if(grid)grid.innerHTML='<div class="resultado-item"><div class="r-val c-danger">'+fmt(pS)+'</div><div class="r-lbl">Sobrepreço</div></div><div class="resultado-item"><div class="r-val c-success">'+fmt(sV)+'</div><div class="r-lbl">Saving Negociação</div></div><div class="resultado-item"><div class="r-val c-danger" style="font-size:26px;">'+fmt(perdaT)+'</div><div class="r-lbl">TOTAL</div></div>';
+    const al=document.getElementById('resultado-compras-alertas');if(al){let h='';const co=getVal('comp-concentracao');if(co>50)h+='<div class="alert-box danger"><i class="fas fa-exclamation-triangle"></i> Concentração '+co+'%</div>';if(sC>40)h+='<div class="alert-box warning"><i class="fas fa-search-dollar"></i> '+sC+'% sem cotação</div>';al.innerHTML=h;}
+}
+function salvarCompras(){calcularCompras();atualizarStatusModulos();atualizarDashboard();alert('✅ Compras salvo!');}
+
+// ========== FINANCEIRO ==========
+function calcularFinanceiro(){
+    const cart=getVal('fin-carteira'),inad=getVal('fin-inadimplencia'),pmr=getVal('fin-pmr'),pmp=getVal('fin-pmp'),juros=getVal('fin-juros'),tarif=getVal('fin-tarifas'),multas=getVal('fin-multas'),txE=getVal('fin-taxa-emprestimo'),saldo=getVal('fin-saldo-emprestimo'),txB=getVal('fin-taxa-bench')||14;
+    if(cart>0&&inad>0)setVal('fin-taxa-inadimplencia',fmtP((inad/cart)*100));
+    if(pmr>0||pmp>0)setVal('fin-ciclo',(pmr-pmp)+' dias');
+    setVal('fin-total-custos',fmt(juros+tarif+multas));
+    let pTx=0;if(saldo>0&&txE>txB){pTx=saldo*((txE-txB)/100);setVal('fin-perda-taxa',fmt(pTx));}
+    const perdaT=inad+multas+pTx;setVal('fin-perda-total',fmt(perdaT));
+    DADOS.financeiro={perdaTotal:perdaT,inadimplencia:inad,multas:multas,perdaTaxa:pTx};DADOS.perdas.financeiro=perdaT;salvarNoStorage();
+    const grid=document.getElementById('resultado-financeiro-grid');
+    if(grid)grid.innerHTML='<div class="resultado-item"><div class="r-val c-danger">'+fmt(inad)+'</div><div class="r-lbl">Inadimplência</div></div><div class="resultado-item"><div class="r-val c-warning">'+fmt(multas)+'</div><div class="r-lbl">Multas</div></div><div class="resultado-item"><div class="r-val c-purple">'+fmt(pTx)+'</div><div class="r-lbl">Perda Taxa</div></div><div class="resultado-item"><div class="r-val c-danger" style="font-size:26px;">'+fmt(perdaT)+'</div><div class="r-lbl">TOTAL</div></div>';
+    const al=document.getElementById('resultado-financeiro-alertas');if(al){let h='';if(cart>0&&inad>0&&(inad/cart*100)>5)h+='<div class="alert-box danger"><i class="fas fa-exclamation-circle"></i> Inadimplência >5%</div>';if(pmr>pmp+15)h+='<div class="alert-box warning"><i class="fas fa-hourglass-half"></i> Ciclo '+(pmr-pmp)+' dias</div>';if(pTx>0)h+='<div class="alert-box success"><i class="fas fa-university"></i> Saving '+fmt(pTx)+'/ano</div>';al.innerHTML=h;}
+}
+function salvarFinanceiro(){calcularFinanceiro();atualizarStatusModulos();atualizarDashboard();alert('✅ Financeiro salvo!');}
+
+// ========== STATUS ==========
+function atualizarStatusModulos(){
+    ['empresa','saude','tributario','energia','rh','producao','compras','financeiro'].forEach(m=>{
+        const el=document.getElementById('status-'+m);if(!el)return;
+        const t=DADOS[m]&&Object.keys(DADOS[m]).length>0;
+        el.innerHTML=t?'<span class="status-dot" style="background:var(--success)"></span> <span class="c-success">Preenchido ✓</span>':'<span class="status-dot" style="background:var(--warning)"></span> <span class="c-warning">Pendente</span>';
+    });
+}
+
+// ========== DASHBOARD ==========
+function atualizarDashboard(){
+    let tp=0;Object.values(DADOS.perdas).forEach(v=>{if(v&&!isNaN(v))tp+=v;});
+    document.getElementById('dash-perdas-total').textContent=fmt(tp);
+    document.getElementById('dash-saving-total').textContent=fmt(tp*0.65);
+    const sc=calcularScoreEZ();document.getElementById('dash-score-total').textContent=sc>0?sc:'--';
+    if(tp>0){
+        const card=document.getElementById('dash-resumo-perdas');if(card)card.classList.remove('hidden');
+        const lista=document.getElementById('dash-perdas-lista');
+        if(lista){
+            const ms=[{n:'Saúde',v:DADOS.perdas.saude||0,i:'fa-heartbeat',c:'danger'},{n:'Tributário',v:DADOS.perdas.tributario||0,i:'fa-landmark',c:'purple'},{n:'Energia',v:DADOS.perdas.energia||0,i:'fa-bolt',c:'warning'},{n:'RH',v:DADOS.perdas.rh||0,i:'fa-users',c:'success'},{n:'Produção',v:DADOS.perdas.producao||0,i:'fa-industry',c:'orange'},{n:'Compras',v:DADOS.perdas.compras||0,i:'fa-shopping-cart',c:'info'},{n:'Financeiro',v:DADOS.perdas.financeiro||0,i:'fa-dollar-sign',c:'warning'}].filter(m=>m.v>0).sort((a,b)=>b.v-a.v);
+            let h='';ms.forEach(m=>{const p=(m.v/tp*100);h+='<div class="loss-item"><div class="loss-icon bg-'+m.c+'-light c-'+m.c+'"><i class="fas '+m.i+'"></i></div><div class="loss-info"><h4>'+m.n+'</h4><div class="mini-progress" style="margin-top:6px;"><div class="mp-bar"><div class="mp-fill" style="width:'+p+'%;background:var(--'+m.c+');"></div></div></div></div><div class="loss-value"><div class="amount c-'+m.c+'">'+fmt(m.v)+'</div><div class="pct">'+fmtP(p)+'</div></div></div>';});
+            lista.innerHTML=h;
+        }
+    }
+}
+
+// ========== SCORE EZ ==========
+function calcularScoreEZ(){
+    let pts=100,n=0;
+    if(DADOS.saude&&DADOS.saude.sinistralidade>0){n++;pts-=DADOS.saude.sinistralidade>85?15:DADOS.saude.sinistralidade>75?8:2;}
+    if(DADOS.rh&&DADOS.rh.turnover>0){n++;pts-=DADOS.rh.turnover>5?15:DADOS.rh.turnover>3?8:2;}
+    if(DADOS.producao&&DADOS.producao.oee>0){n++;pts-=DADOS.producao.oee<65?15:DADOS.producao.oee<80?8:2;}
+    if(DADOS.tributario&&DADOS.tributario.perdaTotal>100000){n++;pts-=10;}
+    if(DADOS.energia&&DADOS.energia.perdaTotal>50000){n++;pts-=8;}
+    if(DADOS.compras&&DADOS.compras.perdaTotal>100000){n++;pts-=8;}
+    if(DADOS.financeiro&&DADOS.financeiro.perdaTotal>100000){n++;pts-=8;}
+    if(n===0)return 0;
+    DADOS.score=Math.max(0,Math.min(100,Math.round(pts)));salvarNoStorage();return DADOS.score;
+}
+
+// ========== CALCULAR TUDO ==========
+function calcularTudo(){
+    calcularSaude();calcularTributario();calcularEnergia();calcularRH();calcularProducao();calcularCompras();calcularFinanceiro();
+    atualizarDashboard();atualizarStatusModulos();gerarResultadoGeral();gerarMatrizPerdas();gerarScorePage();gerarPriorizacao();
+    alert('✅ Tudo calculado!');
+}
+
+// ========== RESULTADO GERAL ==========
+function gerarResultadoGeral(){
+    let tp=0;Object.values(DADOS.perdas).forEach(v=>{if(v&&!isNaN(v))tp+=v;});if(tp===0)return;
+    document.getElementById('resultado-geral-kpis').classList.remove('hidden');
+    document.getElementById('resultado-geral-detalhes').classList.remove('hidden');
+    const c=document.getElementById('resultado-geral-content');if(c)c.style.display='none';
+    document.getElementById('rg-perdas-total').textContent=fmt(tp);
+    document.getElementById('rg-saving-total').textContent=fmt(tp*0.65);
+    document.getElementById('rg-score').textContent=DADOS.score||'--';
+    const fat=DADOS.empresa.faturamento||0;if(fat>0)document.getElementById('rg-perc-faturamento').textContent=fmtP((tp/fat)*100);
+    const ms=[{n:'Tributário',v:DADOS.perdas.tributario||0},{n:'Saúde',v:DADOS.perdas.saude||0},{n:'RH',v:DADOS.perdas.rh||0},{n:'Produção',v:DADOS.perdas.producao||0},{n:'Energia',v:DADOS.perdas.energia||0},{n:'Compras',v:DADOS.perdas.compras||0},{n:'Financeiro',v:DADOS.perdas.financeiro||0}].sort((a,b)=>b.v-a.v);
+    let h='',r=1;ms.forEach(m=>{if(m.v>0){const p=(m.v/tp*100);const st=m.v>200000?'<span class="priority-tag critical">Crítico</span>':m.v>100000?'<span class="priority-tag high">Alto</span>':'<span class="priority-tag medium">Médio</span>';h+='<tr><td><span class="rank-num">'+r+'</span></td><td><strong>'+m.n+'</strong></td><td style="font-weight:700;">'+fmt(m.v)+'</td><td>'+fmtP(p)+'</td><td>'+st+'</td></tr>';r++;}});
+    h+='<tr style="background:var(--danger-bg);"><td></td><td><strong>TOTAL</strong></td><td style="font-weight:800;color:var(--danger);">'+fmt(tp)+'</td><td>100%</td><td></td></tr>';
+    document.getElementById('rg-tabela-body').innerHTML=h;
+}
+
+// ========== MATRIZ DE PERDAS ==========
+function gerarMatrizPerdas(){
+    const container=document.getElementById('matriz-perdas-content');
+    let tp=0;Object.values(DADOS.perdas).forEach(v=>{if(v&&!isNaN(v))tp+=v;});if(tp===0)return;
+    let perdas=[];
+    if(DADOS.saude){if(DADOS.saude.perdaReajuste>0)perdas.push({n:'Reajuste plano saúde',m:'Saúde',v:DADOS.saude.perdaReajuste});if(DADOS.saude.perdaSinistralidade>0)perdas.push({n:'Sinistralidade alta',m:'Saúde',v:DADOS.saude.perdaSinistralidade});if(DADOS.saude.custoAbsenteismo>0)perdas.push({n:'Absenteísmo',m:'Saúde',v:DADOS.saude.custoAbsenteismo});}
+    if(DADOS.tributario&&DADOS.tributario.creditos)DADOS.tributario.creditos.forEach(c=>perdas.push({n:c.nome,m:'Tributário',v:c.valor}));
+    if(DADOS.energia){if(DADOS.energia.perdaDemanda>0)perdas.push({n:'Demanda excedente',m:'Energia',v:DADOS.energia.perdaDemanda});if(DADOS.energia.perdaReativa>0)perdas.push({n:'Multas reativos',m:'Energia',v:DADOS.energia.perdaReativa});if(DADOS.energia.savingML>0)perdas.push({n:'Saving Mercado Livre',m:'Energia',v:DADOS.energia.savingML});}
+    if(DADOS.rh){if(DADOS.rh.perdaTurnover>0)perdas.push({n:'Turnover excedente',m:'RH',v:DADOS.rh.perdaTurnover});if(DADOS.rh.hePerda>0)perdas.push({n:'HE desnecessária',m:'RH',v:DADOS.rh.hePerda});}
+    if(DADOS.producao){if(DADOS.producao.perdaRefugo>0)perdas.push({n:'Refugo',m:'Produção',v:DADOS.producao.perdaRefugo});if(DADOS.producao.perdaParadas>0)perdas.push({n:'Paradas',m:'Produção',v:DADOS.producao.perdaParadas});}
+    if(DADOS.compras){if(DADOS.compras.perdaSobrepreco>0)perdas.push({n:'Sobrepreço',m:'Compras',v:DADOS.compras.perdaSobrepreco});if(DADOS.compras.savingValor>0)perdas.push({n:'Saving negociação',m:'Compras',v:DADOS.compras.savingValor});}
+    if(DADOS.financeiro){if(DADOS.financeiro.inadimplencia>0)perdas.push({n:'Inadimplência',m:'Financeiro',v:DADOS.financeiro.inadimplencia});if(DADOS.financeiro.multas>0)perdas.push({n:'Multas/juros',m:'Financeiro',v:DADOS.financeiro.multas});if(DADOS.financeiro.perdaTaxa>0)perdas.push({n:'Taxa bancária alta',m:'Financeiro',v:DADOS.financeiro.perdaTaxa});}
+    perdas.sort((a,b)=>b.v-a.v);
+    let h='<div class="kpi-grid"><div class="kpi-card"><div class="kpi-top"><div class="kpi-icon bg-danger-light c-danger"><i class="fas fa-exclamation-triangle"></i></div></div><div class="kpi-value c-danger">'+fmt(tp)+'</div><div class="kpi-label">Total Perdas</div></div><div class="kpi-card"><div class="kpi-top"><div class="kpi-icon bg-info-light c-info"><i class="fas fa-list"></i></div></div><div class="kpi-value c-info">'+perdas.length+'</div><div class="kpi-label">Itens</div></div><div class="kpi-card"><div class="kpi-top"><div class="kpi-icon bg-success-light c-success"><i class="fas fa-hand-holding-usd"></i></div></div><div class="kpi-value c-success">'+fmt(tp*0.65)+'</div><div class="kpi-label">Saving (65%)</div></div></div>';
+    h+='<div class="ez-card"><div class="card-header-ez"><h3><i class="fas fa-sort-amount-down"></i> Ranking Detalhado</h3></div><div class="card-body-ez" style="padding:0;"><table class="ranking-table"><thead><tr><th>#</th><th>Perda</th><th>Módulo</th><th>Valor</th><th>%</th></tr></thead><tbody>';
+    perdas.forEach((p,i)=>{h+='<tr><td><span class="rank-num">'+(i+1)+'</span></td><td><strong>'+p.n+'</strong></td><td>'+p.m+'</td><td style="font-weight:700;">'+fmt(p.v)+'</td><td>'+fmtP(p.v/tp*100)+'</td></tr>';});
+    h+='</tbody></table></div></div>';
+    container.innerHTML=h;
+}
+
+// ========== SCORE PAGE ==========
+function gerarScorePage(){
+    const container=document.getElementById('score-content');const score=DADOS.score;if(!score)return;
+    const cor=score>=80?'var(--success)':score>=60?'var(--warning)':'var(--danger)';
+    const nivel=score>=80?'BOM':score>=60?'REGULAR':'CRÍTICO';
+    const emoji=score>=80?'🟢':score>=60?'🟡':'🔴';
+    let h='<div class="row-2"><div class="ez-card"><div class="card-body-ez" style="text-align:center;padding:40px;"><div style="font-size:72px;font-weight:900;color:'+cor+';line-height:1;">'+score+'</div><div style="font-size:16px;font-weight:700;margin-top:8px;color:'+cor+';">'+emoji+' '+nivel+'</div><div style="font-size:13px;color:var(--text-muted);margin-top:8px;">Score EZ Performance360</div></div></div>';
+    h+='<div class="ez-card"><div class="card-header-ez"><h3><i class="fas fa-chart-bar"></i> Por Dimensão</h3></div><div class="card-body-ez">';
+    const dims=[{n:'Saúde',nota:DADOS.saude.sinistralidade>85?40:DADOS.saude.sinistralidade>75?65:90},{n:'Tributário',nota:DADOS.tributario.perdaTotal>500000?45:DADOS.tributario.perdaTotal>100000?65:85},{n:'Energia',nota:DADOS.energia.perdaTotal>200000?50:DADOS.energia.perdaTotal>50000?70:88},{n:'RH',nota:DADOS.rh.turnover>5?40:DADOS.rh.turnover>3?60:85},{n:'Produção',nota:DADOS.producao.oee>0?Math.min(95,DADOS.producao.oee):75},{n:'Compras',nota:DADOS.compras.perdaTotal>200000?50:DADOS.compras.perdaTotal>50000?70:85},{n:'Financeiro',nota:DADOS.financeiro.perdaTotal>200000?45:DADOS.financeiro.perdaTotal>50000?65:85}];
+    dims.forEach(d=>{const cb=d.nota>=80?'var(--success)':d.nota>=60?'var(--warning)':'var(--danger)';h+='<div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:13px;font-weight:600;">'+d.n+'</span><span style="font-size:13px;font-weight:700;color:'+cb+';">'+Math.round(d.nota)+'</span></div><div class="mp-bar"><div class="mp-fill" style="width:'+d.nota+'%;background:'+cb+';"></div></div></div>';});
+    h+='</div></div></div>';
+    container.innerHTML=h;
+}
+
+// ========== PRIORIZAÇÃO ==========
+function gerarPriorizacao(){
+    const container=document.getElementById('priorizacao-content');
+    let tp=0;Object.values(DADOS.perdas).forEach(v=>{if(v&&!isNaN(v))tp+=v;});if(tp===0)return;
+    let acoes=[];
+    if(DADOS.saude.perdaReajuste>0)acoes.push({a:'Renegociar plano saúde',m:'Saúde',s:DADOS.saude.perdaReajuste*0.7,inv:'Baixo',pr:'30d',g:5,u:5,t:4});
+    if(DADOS.saude.perdaSinistralidade>0)acoes.push({a:'Programa gestão saúde',m:'Saúde',s:DADOS.saude.perdaSinistralidade*0.5,inv:'Médio',pr:'90d',g:4,u:4,t:5});
+    if(DADOS.tributario.perdaTotal>0)acoes.push({a:'Recuperar créditos tributários',m:'Tributário',s:DADOS.tributario.perdaTotal*0.8,inv:'Médio',pr:'120d',g:5,u:4,t:3});
+    if(DADOS.energia.perdaDemanda>0)acoes.push({a:'Adequar demanda',m:'Energia',s:DADOS.energia.perdaDemanda*0.9,inv:'Zero',pr:'15d',g:4,u:5,t:3});
+    if(DADOS.energia.savingML>0)acoes.push({a:'Migrar Mercado Livre',m:'Energia',s:DADOS.energia.savingML*0.85,inv:'Baixo',pr:'60d',g:4,u:4,t:4});
+    if(DADOS.rh.perdaTurnover>0)acoes.push({a:'Programa retenção',m:'RH',s:DADOS.rh.perdaTurnover*0.5,inv:'Médio',pr:'90d',g:4,u:3,t:5});
+    if(DADOS.rh.hePerda>0)acoes.push({a:'Controle HE',m:'RH',s:DADOS.rh.hePerda*0.7,inv:'Zero',pr:'15d',g:3,u:4,t:3});
+    if(DADOS.producao.perdaRefugo>0)acoes.push({a:'Programa zero defeito',m:'Produção',s:DADOS.producao.perdaRefugo*0.6,inv:'Médio',pr:'120d',g:5,u:4,t:5});
+    if(DADOS.producao.perdaParadas>0)acoes.push({a:'TPM / Manutenção preventiva',m:'Produção',s:DADOS.producao.perdaParadas*0.5,inv:'Médio',pr:'90d',g:4,u:4,t:4});
+    if(DADOS.compras.perdaSobrepreco>0)acoes.push({a:'Política cotação obrigatória',m:'Compras',s:DADOS.compras.perdaSobrepreco*0.7,inv:'Zero',pr:'30d',g:4,u:4,t:3});
+    if(DADOS.compras.savingValor>0)acoes.push({a:'Renegociar contratos',m:'Compras',s:DADOS.compras.savingValor*0.6,inv:'Baixo',pr:'60d',g:3,u:3,t:3});
+    if(DADOS.financeiro.perdaTaxa>0)acoes.push({a:'Renegociação bancária',m:'Financeiro',s:DADOS.financeiro.perdaTaxa*0.6,inv:'Zero',pr:'30d',g:3,u:3,t:3});
+    if(DADOS.financeiro.inadimplencia>0)acoes.push({a:'Revisão política crédito',m:'Financeiro',s:DADOS.financeiro.inadimplencia*0.5,inv:'Baixo',pr:'60d',g:4,u:4,t:4});
+
+    acoes.forEach(a=>{a.gut=a.g*a.u*a.t;});
+    acoes.sort((a,b)=>b.gut-a.gut);
+
+    let totalSaving=0;acoes.forEach(a=>totalSaving+=a.s);
+
+    let h='<div class="kpi-grid"><div class="kpi-card"><div class="kpi-top"><div class="kpi-icon bg-success-light c-success"><i class="fas fa-hand-holding-usd"></i></div></div><div class="kpi-value c-success">'+fmt(totalSaving)+'</div><div class="kpi-label">Saving Total Estimado</div></div><div class="kpi-card"><div class="kpi-top"><div class="kpi-icon bg-info-light c-info"><i class="fas fa-tasks"></i></div></div><div class="kpi-value c-info">'+acoes.length+'</div><div class="kpi-label">Ações Identificadas</div></div><div class="kpi-card"><div class="kpi-top"><div class="kpi-icon bg-purple-light c-purple"><i class="fas fa-bolt"></i></div></div><div class="kpi-value c-purple">'+acoes.filter(a=>a.inv==='Zero').length+'</div><div class="kpi-label">Quick Wins (Custo Zero)</div></div></div>';
+
+    h+='<div class="ez-card"><div class="card-header-ez"><h3><i class="fas fa-sort-amount-down"></i> Ranking GUT × Saving</h3></div><div class="card-body-ez" style="padding:0;"><table class="ranking-table"><thead><tr><th>#</th><th>Ação</th><th>Módulo</th><th>Saving</th><th>Invest.</th><th>Prazo</th><th>GUT</th></tr></thead><tbody>';
+    acoes.forEach((a,i)=>{
+        const gutTag=a.gut>=80?'<span class="priority-tag critical">'+a.gut+'</span>':a.gut>=50?'<span class="priority-tag high">'+a.gut+'</span>':'<span class="priority-tag medium">'+a.gut+'</span>';
+        h+='<tr><td><span class="rank-num">'+(i+1)+'</span></td><td><strong>'+a.a+'</strong></td><td>'+a.m+'</td><td style="font-weight:700;">'+fmt(a.s)+'</td><td>'+a.inv+'</td><td>'+a.pr+'</td><td>'+gutTag+'</td></tr>';
+    });
+    h+='<tr style="background:var(--success-bg);"><td></td><td><strong>TOTAL SAVING</strong></td><td></td><td style="font-weight:800;color:var(--success);">'+fmt(totalSaving)+'</td><td></td><td></td><td></td></tr>';
+    h+='</tbody></table></div></div>';
+
+    // Quick wins
+    const qw=acoes.filter(a=>a.inv==='Zero');
+    if(qw.length>0){
+        h+='<div class="ez-card" style="margin-top:24px;"><div class="card-header-ez"><h3><i class="fas fa-bolt"></i> Quick Wins — Custo Zero</h3></div><div class="card-body-ez">';
+        qw.forEach(a=>{h+='<div class="alert-box success" style="margin-bottom:8px;"><i class="fas fa-check-circle"></i> <strong>'+a.a+'</strong> — Saving: '+fmt(a.s)+' — Prazo: '+a.pr+'</div>';});
+        h+='</div></div>';
+    }
+    container.innerHTML=h;
+}
+
+// ========== RESTAURAR FORMULÁRIOS ==========
+function restaurarFormularios(){
+    const e=DADOS.empresa;
+    if(e.cnpj){
+        setVal('emp-cnpj',e.cnpj);setVal('emp-razao',e.razao);
+        document.getElementById('emp-segmento').value=e.segmento||'';
+        document.getElementById('emp-regime').value=e.regime||'';
+        document.getElementById('emp-uf').value=e.uf||'';
+        setVal('emp-faturamento',e.faturamento||'');setVal('emp-lucro',e.lucro||'');
+        setVal('emp-colaboradores',e.colaboradores||'');setVal('emp-folha',e.folha||'');
+        setVal('emp-responsavel',e.responsavel||'');setVal('emp-cargo',e.cargo||'');setVal('emp-email',e.email||'');
+        if(e.margem)setVal('emp-margem',fmtP(e.margem));
+        if(e.folhaAnual)setVal('emp-folha-anual',fmt(e.folhaAnual));
+    }
+}
+
+// ========== LIMPAR FUNÇÕES ==========
+function limparEmpresa(){if(confirm('Limpar dados da empresa?')){DADOS.empresa={};salvarNoStorage();['emp-cnpj','emp-razao','emp-faturamento','emp-lucro','emp-colaboradores','emp-folha','emp-responsavel','emp-cargo','emp-email'].forEach(id=>setVal(id,''));setVal('emp-margem','--');setVal('emp-folha-anual','--');document.getElementById('emp-segmento').value='';document.getElementById('emp-regime').value='';document.getElementById('emp-uf').value='';atualizarStatusModulos();}}
+function limparSaude(){if(confirm('Limpar?')){DADOS.saude={};DADOS.perdas.saude=0;salvarNoStorage();document.querySelectorAll('#page-form-saude input').forEach(i=>i.type!=='button'&&(i.readOnly?i.value='--':i.value=''));document.getElementById('resultado-saude').classList.add('hidden');atualizarStatusModulos();atualizarDashboard();}}
+function limparTributario(){if(confirm('Limpar?')){DADOS.tributario={};DADOS.perdas.tributario=0;salvarNoStorage();document.querySelectorAll('#page-form-tributario input[type="number"]').forEach(i=>i.value='');document.querySelectorAll('#page-form-tributario input[type="checkbox"]').forEach(i=>i.checked=false);setVal('trib-total','--');setVal('trib-carga','--');document.getElementById('resultado-tributario').classList.add('hidden');atualizarStatusModulos();atualizarDashboard();}}
+function limparEnergia(){if(confirm('Limpar?')){DADOS.energia={};DADOS.perdas.energia=0;salvarNoStorage();document.querySelectorAll('#page-form-energia input[type="number"]').forEach(i=>i.value='');document.querySelectorAll('#page-form-energia input[type="checkbox"]').forEach(i=>i.checked=false);setVal('energia-custo-anual','--');setVal('energia-excedente-demanda','--');document.getElementById('resultado-energia').classList.add('hidden');atualizarStatusModulos();atualizarDashboard();}}
+function limparRH(){if(confirm('Limpar?')){DADOS.rh={};DADOS.perdas.rh=0;salvarNoStorage();document.querySelectorAll('#page-form-rh input[type="number"]').forEach(i=>i.value='');['rh-turnover','rh-custo-turnover','rh-he-custo-mensal','rh-he-custo-anual','rh-he-perda','rh-he-per-capita'].forEach(id=>setVal(id,'--'));document.getElementById('resultado-rh').classList.add('hidden');atualizarStatusModulos();atualizarDashboard();}}
+function limparProducao(){if(confirm('Limpar?')){DADOS.producao={};DADOS.perdas.producao=0;salvarNoStorage();document.querySelectorAll('#page-form-producao input[type="number"]').forEach(i=>i.value='');['prod-disponibilidade','prod-performance','prod-qualidade','prod-oee','prod-gap-oee','prod-perda-refugo','prod-perda-paradas','prod-perda-total'].forEach(id=>setVal(id,'--'));document.getElementById('resultado-producao').classList.add('hidden');atualizarStatusModulos();atualizarDashboard();}}
+function limparCompras(){if(confirm('Limpar?')){DADOS.compras={};DADOS.perdas.compras=0;salvarNoStorage();document.querySelectorAll('#page-form-compras input[type="number"]').forEach(i=>i.value='');['comp-perda-sobrepreco','comp-saving-valor','comp-perda-total'].forEach(id=>setVal(id,'--'));document.getElementById('resultado-compras').classList.add('hidden');atualizarStatusModulos();atualizarDashboard();}}
+function limparFinanceiro(){if(confirm('Limpar?')){DADOS.financeiro={};DADOS.perdas.financeiro=0;salvarNoStorage();document.querySelectorAll('#page-form-financeiro input[type="number"]').forEach(i=>i.value='');['fin-taxa-inadimplencia','fin-ciclo','fin-total-custos','fin-perda-taxa','fin-perda-total'].forEach(id=>setVal(id,'--'));document.getElementById('resultado-financeiro').classList.add('hidden');atualizarStatusModulos();atualizarDashboard();}}
+
+function limparTudo(){
+    if(confirm('⚠️ ATENÇÃO: Isso vai apagar TODOS os dados de TODOS os módulos. Deseja continuar?')){
+        DADOS={empresa:{},saude:{},tributario:{},energia:{},rh:{},producao:{},compras:{},financeiro:{},perdas:{},score:0};
+        localStorage.removeItem('ezaudita_dados');
+        location.reload();
+    }
+}
+
+// ========== EXPORTAR / IMPORTAR ==========
+function exportarDados(){
+    const blob=new Blob([JSON.stringify(DADOS,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    const nomeEmpresa=DADOS.empresa.razao||'empresa';
+    const data=new Date().toISOString().slice(0,10);
+    a.download='ezaudita_'+nomeEmpresa.replace(/\s+/g,'_')+'_'+data+'.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function importarDados(event){
+    const file=event.target.files[0];
+    if(!file)return;
+    const reader=new FileReader();
+    reader.onload=function(e){
+        try{
+            DADOS=JSON.parse(e.target.result);
+            salvarNoStorage();
+            restaurarFormularios();
+            atualizarStatusModulos();
+            atualizarDashboard();
+            alert('✅ Dados importados com sucesso!');
+        }catch(err){
+            alert('❌ Erro ao importar arquivo. Verifique se é um JSON válido.');
+        }
+    };
+    reader.readAsText(file);
+}
+
+// ========== IMPRIMIR RELATÓRIO ==========
+function imprimirRelatorio(){
+    calcularTudo();
+    const fat=DADOS.empresa.faturamento||0;
+    let tp=0;Object.values(DADOS.perdas).forEach(v=>{if(v&&!isNaN(v))tp+=v;});
+
+    const w=window.open('','_blank');
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Relatório EZ Audita</title>
+    <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:Arial,sans-serif;padding:40px;color:#1A1D29;font-size:13px;line-height:1.6;}
+    h1{font-size:24px;color:#F97316;margin-bottom:4px;}
+    h2{font-size:18px;margin:24px 0 12px;padding-bottom:8px;border-bottom:2px solid #F97316;}
+    h3{font-size:14px;margin:16px 0 8px;}
+    .header{text-align:center;margin-bottom:32px;padding-bottom:20px;border-bottom:3px solid #F97316;}
+    .header small{color:#8A8FA3;font-size:12px;}
+    .empresa{background:#F5F6FA;padding:16px;border-radius:8px;margin-bottom:24px;}
+    .empresa p{margin:4px 0;}
+    .kpi-row{display:flex;gap:16px;margin-bottom:24px;}
+    .kpi{flex:1;background:#F5F6FA;padding:16px;border-radius:8px;text-align:center;}
+    .kpi .val{font-size:22px;font-weight:800;}
+    .kpi .lbl{font-size:11px;color:#8A8FA3;}
+    .danger{color:#EF4444;}
+    .success{color:#10B981;}
+    .orange{color:#F97316;}
+    table{width:100%;border-collapse:collapse;margin-bottom:24px;}
+    th{text-align:left;padding:10px;background:#F5F6FA;font-size:11px;text-transform:uppercase;border-bottom:2px solid #E5E7EB;}
+    td{padding:10px;border-bottom:1px solid #E5E7EB;font-size:12px;}
+    .tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;}
+    .tag-critical{background:#FEE2E2;color:#EF4444;}
+    .tag-high{background:#FEF3C7;color:#F59E0B;}
+    .tag-medium{background:#DBEAFE;color:#3B82F6;}
+    .footer{margin-top:40px;text-align:center;font-size:11px;color:#8A8FA3;border-top:1px solid #E5E7EB;padding-top:16px;}
+    @media print{body{padding:20px;}h2{page-break-before:auto;}}
+    </style></head><body>
+    <div class="header">
+        <h1>EZ.Audita Performance360</h1>
+        <small>Relatório de Auditoria Operacional</small><br>
+        <small>Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</small>
+    </div>
+
+    <div class="empresa">
+        <p><strong>Empresa:</strong> ${DADOS.empresa.razao||'Não informado'}</p>
+        <p><strong>CNPJ:</strong> ${DADOS.empresa.cnpj||'--'} | <strong>Segmento:</strong> ${DADOS.empresa.segmento||'--'} | <strong>Regime:</strong> ${DADOS.empresa.regime||'--'}</p>
+        <p><strong>Faturamento:</strong> ${fmt(fat)} | <strong>Colaboradores:</strong> ${DADOS.empresa.colaboradores||'--'} | <strong>UF:</strong> ${DADOS.empresa.uf||'--'}</p>
+    </div>
+
+    <div class="kpi-row">
+        <div class="kpi"><div class="val danger">${fmt(tp)}</div><div class="lbl">Total Perdas</div></div>
+        <div class="kpi"><div class="val success">${fmt(tp*0.65)}</div><div class="lbl">Saving Potencial</div></div>
+        <div class="kpi"><div class="val orange">${DADOS.score||'--'}</div><div class="lbl">Score EZ</div></div>
+        <div class="kpi"><div class="val">${fat>0?fmtP((tp/fat)*100):'--'}</div><div class="lbl">% vs Faturamento</div></div>
+    </div>
+
+    <h2>Perdas por Módulo</h2>
+    <table>
+        <thead><tr><th>#</th><th>Módulo</th><th>Perda (R$/ano)</th><th>% Total</th><th>Status</th></tr></thead>
+        <tbody>`);
+
+    const mods=[{n:'Tributário',v:DADOS.perdas.tributario||0},{n:'Saúde',v:DADOS.perdas.saude||0},{n:'RH',v:DADOS.perdas.rh||0},{n:'Produção',v:DADOS.perdas.producao||0},{n:'Energia',v:DADOS.perdas.energia||0},{n:'Compras',v:DADOS.perdas.compras||0},{n:'Financeiro',v:DADOS.perdas.financeiro||0}].sort((a,b)=>b.v-a.v);
+    let r=1;
+    mods.forEach(m=>{
+        if(m.v>0){
+            const p=(m.v/tp*100);
+            const st=m.v>200000?'<span class="tag tag-critical">Crítico</span>':m.v>100000?'<span class="tag tag-high">Alto</span>':'<span class="tag tag-medium">Médio</span>';
+            w.document.write('<tr><td>'+r+'</td><td><strong>'+m.n+'</strong></td><td>'+fmt(m.v)+'</td><td>'+fmtP(p)+'</td><td>'+st+'</td></tr>');
+            r++;
+        }
+    });
+    w.document.write('<tr style="background:#FEE2E2;"><td></td><td><strong>TOTAL</strong></td><td><strong>'+fmt(tp)+'</strong></td><td>100%</td><td></td></tr>');
+
+    w.document.write(`</tbody></table>
+
+    <h2>Destaques por Área</h2>`);
+
+    if(DADOS.saude.perdaTotal>0)w.document.write('<h3>🏥 Saúde</h3><p>Perda reajuste: '+fmt(DADOS.saude.perdaReajuste)+' | Sinistralidade: '+fmt(DADOS.saude.perdaSinistralidade)+' | Absenteísmo: '+fmt(DADOS.saude.custoAbsenteismo)+'</p>');
+    if(DADOS.tributario.perdaTotal>0){w.document.write('<h3>🏛️ Tributário</h3>');DADOS.tributario.creditos.forEach(c=>{w.document.write('<p>• '+c.nome+': '+fmt(c.valor)+' (ROI: '+c.roi+')</p>');});}
+    if(DADOS.producao.oee>0)w.document.write('<h3>🏭 Produção</h3><p>OEE: '+fmtP(DADOS.producao.oee)+' | Refugo: '+fmt(DADOS.producao.perdaRefugo)+' | Paradas: '+fmt(DADOS.producao.perdaParadas)+'</p>');
+    if(DADOS.rh.perdaTotal>0)w.document.write('<h3>👥 RH</h3><p>Turnover: '+fmtP(DADOS.rh.turnover)+' | Perda turnover: '+fmt(DADOS.rh.perdaTurnover)+' | HE desnecessária: '+fmt(DADOS.rh.hePerda)+'</p>');
+
+    w.document.write(`
+    <div class="footer">
+        <p>EZ.Audita Performance360 — Relatório gerado automaticamente</p>
+        <p>Este documento é confidencial e de uso exclusivo do cliente</p>
+    </div>
+    </body></html>`);
+    w.document.close();
+    setTimeout(()=>w.print(),500);
+}
+</script>
+</body>
+</html>
+PARTE 1: <!DOCTYPE html> ... <div class="main-content"> PARTE 2: Dashboard + Empresa + Saúde + Tributário + Energia PARTE 3: RH + Produção + Compras + Financeiro + Resultado + Config + </div> PARTE 4: Este bloco <script> ... </script></body></html>
